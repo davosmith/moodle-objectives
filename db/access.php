@@ -35,7 +35,7 @@ $block_objectives_capabilities = array(
     ),
     
     // Can view objectives on a course
-    'blocks/coursedates:viewobjectives' => array(
+    'blocks/objectives:viewobjectives' => array(
          'captype' => 'read',
          'contextlevel' => CONTEXT_COURSE,
          'legacy' => array(
