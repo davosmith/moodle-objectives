@@ -31,7 +31,7 @@ class block_objectives extends block_base {
         }
 
         $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
-        if (!has_capability('blocks/objectives:viewobjectives', $context)) {
+        if (!has_capability('block/objectives:viewobjectives', $context)) {
             return NULL;
         }
 
