@@ -24,7 +24,7 @@ class block_objectives extends block_base {
     }
 
     function get_content() {
-        global $COURSE, $CFG;
+        global $CFG;
         
         if ($this->content !== NULL) {
             return $this->content;
@@ -70,7 +70,7 @@ class block_objectives extends block_base {
 
             $update = new stdClass;
             $update->id = $data->objectivesid;
-            //$update->course = $COURSE->id; // Should not change
+            //$update->course = $data->course; // Should not change
             $update->intro = $data->intro;
             update_record('objectives',$update);
 
