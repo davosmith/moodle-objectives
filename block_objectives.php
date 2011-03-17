@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__).'/mod_form.php');
+require_once(dirname(__FILE__).'/lib.php');
 
 class block_objectives extends block_base {
 
@@ -9,39 +10,22 @@ class block_objectives extends block_base {
         $this->version = 2011031300;
     }
 
-    function _get_settings() {
-        global $COURSE;
-
-        $settings = get_record('objectives','course',$COURSE->id);
-        if (!$settings) {
-            $settings = new stdClass;
-            $settings->course = $COURSE->id;
-            $settings->intro = get_string('defaultintro','block_objectives');
-            $settings->id = insert_record('objectives',$settings);
-        }
-
-        return $settings;
+    function preferred_width() {
+        return 240;
     }
 
     function get_content() {
-        global $CFG;
+        global $CFG, $COURSE;
         
         if ($this->content !== NULL) {
             return $this->content;
         }
 
-        $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
-        if (!has_capability('block/objectives:viewobjectives', $context)) {
-            return NULL;
-        }
-
-        $settings = $this->_get_settings();
-        $editlink = $CFG->wwwroot.'/blocks/objectives/edit.php?course='.$settings->course;
+        $obj = new block_objectives_class($COURSE);
 
         $this->content = new stdClass;
-        $this->content->footer = '<a href="'.$editlink.'">Edit objectives</a>';
-        $this->content->text = '<strong>'.userdate(time(), get_string('strftimedaydate')).'</strong><br/>';
-        $this->content->text .= s($settings->intro);
+        $this->content->text = $obj->get_block_text();
+        $this->content->footer = $obj->get_block_footer();
 
         return $this->content;
     }
@@ -53,7 +37,8 @@ class block_objectives extends block_base {
     function instance_config_print() {
         global $CFG, $COURSE;
         
-        $settings = $this->_get_settings();
+        $obj = new block_objectives_class($COURSE);
+        $settings = $obj->get_settings();
 
         $returl = $CFG->wwwroot.'/course/view.php?id='.$settings->course;
         $mform = new block_objectives_edit_form(qualified_me());
@@ -80,7 +65,7 @@ class block_objectives extends block_base {
         echo '</form>'; // Close the 'helpful' form provided
         $mform->display();
         echo '<form>'; // Start a fake form, to make sure the tags match
-        
+
         return true;
     }
 
