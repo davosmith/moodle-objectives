@@ -7,7 +7,7 @@ class block_objectives extends block_base {
 
     function init() {
         $this->title = get_string('pluginname','block_objectives');
-        $this->version = 2011031300;
+        $this->version = 2011031301;
     }
 
     function preferred_width() {
