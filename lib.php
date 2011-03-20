@@ -119,14 +119,33 @@ class block_objectives_class {
             }
         }
 
+        $timetables = get_records('objectives_timetable', 'objectivesid', $this->settings->id, 'day, starttime, groupid');
         $days = array('monday'=>array(), 'tuesday'=>array(), 'wednesday'=>array(),
                          'thursday'=>array(), 'friday'=>array(), 'saturday'=>array(),
                          'sunday'=>array());
+        $num2day = array('monday','tuesday','wednesday','thursday','friday','saturday','sunday');
+        $settings = array();
+        $settings['id'] = $this->settings->id;
+        $settings['course'] = $this->course->id;
+        
+        if ($timetables) {
+            $weekday = 0;
+            reset($days);
+            foreach ($timetables as $lesson) {
+                $days[$num2day[$lesson->day]][] = $lesson->id; // Store the id to use when creating the form
+                // Store the settings for this entry
+                $settings["lgroup[{$lesson->id}]"] = $lesson->groupid;
+                $settings["lstarthour[{$lesson->id}]"] = (int)($lesson->starttime / (60 * 60));
+                $settings["lstartminute[{$lesson->id}]"] = (int)(($lesson->starttime / 60) % 60);
+                $settings["lendhour[{$lesson->id}]"] = (int)($lesson->endtime / (60 * 60));
+                $settings["lendminute[{$lesson->id}]"] = (int)(($lesson->endtime / 60) % 60);
+            }
+        }
         $lastnew = 0;
         foreach ($days as $key=>$day) {
             for ($i=0; $i<3; $i++) {
                 $lastnew--;
-                $days[$key][] = $lastnew;
+                $days[$key][] = $lastnew; // The blank entries have distinct, negative ids
             }
         }
         
@@ -134,24 +153,60 @@ class block_objectives_class {
         $objurl = str_replace('viewtab=timetables','viewtab=objectives', $thisurl);
         $mform = new block_objectives_timetable_form($thisurl, array('course' => $this->course, 'days' => $days));
 
-        $settings = new stdClass;
         $mform->set_data($settings);
 
         if ($mform->is_cancelled()) {
-            echo 'Cancelled';
             redirect($objurl);
         }
-        echo 'Not cancelled';
         
         if (($data = $mform->get_data()) && ($data->action == 'savesettings')) {
+            foreach ($data->lgroup as $lid=>$lgroup) {
+                if ($lid < 0 || !isset($timetables[$lid])) { // New entry
+                    if ($lgroup >= 0) { // Not disabled
+                        $new = new stdClass;
+                        $new->objectivesid = $this->settings->id;
+                        $new->groupid = $lgroup;
+                        $new->day = $data->lday[$lid];
+                        $new->starttime = ($data->lstarthour[$lid] * 60 * 60) + ($data->lstartminute[$lid] * 60);
+                        $new->endtime = ($data->lendhour[$lid] * 60 * 60) + ($data->lendminute[$lid] * 60);
+                        $new->id = insert_record('objectives_timetable', $new);
+                    }
+                } else { // Existing entry
+                    if ($lgroup < 0) { // Entry disabled
+                        delete_records('objectives_timetable','id',$lid,'objectivesid',$this->settings->id); // Added 'objectivesid' check, just to be on the safe side
+                    } else { // Update entry (if changed)
+                        $upd = new stdClass;
+                        $upd->id = $lid;
+                        $upd->objectivesid = $this->settings->id;
+                        $upd->groupid = $lgroup;
+                        $upd->day = $data->lday[$lid];
+                        $upd->starttime = ($data->lstarthour[$lid] * 60 * 60) + ($data->lstartminute[$lid] * 60);
+                        $upd->endtime = ($data->lendhour[$lid] * 60 * 60) + ($data->lendminute[$lid] * 60);
 
+                        if ($upd->groupid != $timetables[$lid]->groupid ||
+                            $upd->starttime != $timetables[$lid]->starttime ||
+                            $upd->endtime != $timetables[$lid]->endtime) {  // Something has changed
+                            if ($upd->day == $timetables[$lid] && $upd->objectivesid == $timetables[$lid]) {
+                                update_record('objectives_timetable',$upd);
+                            } else {
+                                $this->print_header();
+                                error('Attempting to update record that does not match database');
+                            }
+                        }
+                    }
+                }
+            }
+            
             if (isset($data->saveandobjectives)) {
                 redirect($objurl);
+            } else {
+                redirect($thisurl);
             }
         }
 
         $this->print_header();
         print_heading(get_string('edittimetables','block_objectives'));
+        print_simple_box(get_string('edittimetablesinst','block_objectives'));
         $mform->display();
         $this->print_footer();
     }
@@ -187,6 +242,7 @@ class block_objectives_timetable_form extends moodleform {
             $minutes[$i] = sprintf('%02d',$i);
         }
 
+        $weekday = 0;
         foreach ($days as $day=>$lessons) {
             $mform->addElement('header', $day, get_string($day,'calendar'));
             foreach ($lessons as $lid) {
@@ -207,8 +263,11 @@ class block_objectives_timetable_form extends moodleform {
                 $lel[] =& $mform->createElement('select', "lendminute[$lid]", get_string('lessonstartminute', 'block_objectives'), $minutes);
                 $mform->disabledIf("lendminute[$lid]","lgroup[$lid]",'eq',-1);
 
+                $lel[] =& $mform->createElement('hidden',"lday[$lid]",$weekday);
+
                 $mform->addGroup($lel, 'lesson'.$lid.'group', get_string('lesson','block_objectives'), array(''), false);
             }
+            $weekday++;
         }
 
         $mform->addElement('hidden', 'id', 0);
