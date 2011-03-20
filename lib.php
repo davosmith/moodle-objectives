@@ -84,9 +84,7 @@ class block_objectives_class {
                 //UT
                 $this->print_header();
                 print_simple_box(get_string('notimetables','block_objectives'));
-                print_continue($returl);
-                // FIXME - put a simple box & print_string message & continue button
-                error('Timetables have not yet been configured for this course and you do not have permission to do so');
+                print_continue($courseurl);
                 $this->print_footer();
                 return;
             }
@@ -97,8 +95,8 @@ class block_objectives_class {
         
         $this->print_header();
         print_heading(get_string('editobjectives','block_objectives'));
-        $timetablesurl = str_replace('viewtab=objectives','viewtab=timetables',$thisurl);
-        print_simple_button(get_string('edittimetables','block_objectives'),$timetablesurl);
+        $timetablesurl = $CFG->wwwroot.'/blocks/objectives/edit.php';;
+        print_single_button($timetablesurl, array('viewtab'=>'timetables', 'course'=>$this->course->id), get_string('edittimetables','block_objectives'));
         $mform->display();
         $this->print_footer();
     }
@@ -108,7 +106,7 @@ class block_objectives_class {
 
         $caneditobjectives = $this->can_edit_objectives();
         $canedittimetables = $this->can_edit_timetables();
-        $returl = $CFG->wwwroot.'/course/view.php?id='.$this->course->id;
+        $courseurl = $CFG->wwwroot.'/course/view.php?id='.$this->course->id;
 
         if (!$canedittimetables) {
             if ($caneditobjectives) {
@@ -156,7 +154,12 @@ class block_objectives_class {
         $mform->set_data($settings);
 
         if ($mform->is_cancelled()) {
-            redirect($objurl);
+            if ($timetables) {
+                redirect($objurl);
+            } else {
+                // Going back to objectives edit screen, with no timetables, would loop back here
+                redirect($courseurl);
+            }
         }
         
         if (($data = $mform->get_data()) && ($data->action == 'savesettings')) {
