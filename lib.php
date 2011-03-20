@@ -92,7 +92,8 @@ class block_objectives_class {
             return;
         }
 
-        $timetables = get_records('objectives_timetable', 'objectivesid', $this->settings->id);
+        // TODO limit to only show objectives for selected group
+        $timetables = get_records('objectives_timetable', 'objectivesid', $this->settings->id, 'day, starttime, groupid');
         if (!$timetables) {
             if ($canedittimetables) {
                 $this->edit_timetables();
@@ -110,15 +111,33 @@ class block_objectives_class {
         $weekstart = $this->getweekstart($weekstart);
         $prevweek = $weekstart - (7 * 24 * 60 * 60);
         $nextweek = $weekstart + (7 * 24 * 60 * 60);
-        
+
         $thisurl = $CFG->wwwroot.'/blocks/objectives/edit.php?viewtab=objectives&course='.$this->course->id;
-        $mform = new block_objectives_objectives_form($thisurl);
+        $mform = new block_objectives_objectives_form($thisurl, array('timetables'=>$timetables, 'course'=>$this->course));
+        
+        // Load all the objectives for the selected week
+        $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = '.$weekstart);
+        $formdata = array();
+        if ($objectives) {
+            foreach ($objectives as $obj) {
+                // TODO - will need to remove the 'completed' symbols from the start of each line
+                $formdata["obj[{$obj->timetableid}]"] = $obj->objectives;
+            }
+        }
+        
+        $mform->set_data($formdata);
+
+        if ($mform->is_cancelled()) {
+            redirect($courseurl);
+        }
         
         $this->print_header();
         print_heading(get_string('editobjectives','block_objectives'));
         print_simple_box_start();
-        $timetablesurl = $CFG->wwwroot.'/blocks/objectives/edit.php';;
-        print_single_button($timetablesurl, array('viewtab'=>'timetables', 'course'=>$this->course->id), get_string('edittimetables','block_objectives'));
+        if ($canedittimetables) {
+            $timetablesurl = $CFG->wwwroot.'/blocks/objectives/edit.php';
+            print_single_button($timetablesurl, array('viewtab'=>'timetables', 'course'=>$this->course->id), get_string('edittimetables','block_objectives'));
+        }
 
         // Output the week navigation options
         $nextlink = $thisurl.'&weekstart='.$nextweek;
@@ -129,6 +148,7 @@ class block_objectives_class {
         print_simple_box_end();
         
         $mform->display();
+        
         $this->print_footer();
     }
 
@@ -325,6 +345,26 @@ class block_objectives_timetable_form extends moodleform {
 class block_objectives_objectives_form extends moodleform {
     function definition() {
         $mform = $this->_form;
+        $custom = $this->_customdata;
+        $timetables = $custom['timetables'];
+        $course = $custom['course'];
+        $groups = groups_get_all_groups($course->id, 0, 0, 'g.id, g.name');
+        $num2day = array('monday','tuesday','wednesday','thursday','friday','saturday','sunday');
+
+        $lastday = -1;
+        foreach ($timetables as $lesson) {
+            if ($lastday != $lesson->day) {
+                $day = $num2day[$lesson->day];
+                $mform->addElement('header', $day, get_string($day,'calendar'));
+                $lastday = $lesson->day;
+            }
+            $objlabel = userdate($lesson->starttime, get_string('strftimetime')).'-';
+            $objlabel .= userdate($lesson->endtime, get_string('strftimetime'));
+            if ($lesson->groupid > 0) {
+                $objlabel .= ' ('.$groups[$lesson->groupid]->name.')';
+            }
+            $mform->addElement('textarea',"obj[{$lesson->id}]", $objlabel, array('cols'=>40,'rows'=>5));
+        }
     }
 }
 
