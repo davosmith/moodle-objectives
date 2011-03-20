@@ -113,11 +113,16 @@ class block_objectives_class {
         $nextweek = $weekstart + (7 * 24 * 60 * 60);
 
         $thisurl = $CFG->wwwroot.'/blocks/objectives/edit.php?viewtab=objectives&course='.$this->course->id;
+        $nextlink = $thisurl.'&weekstart='.$nextweek;
+        $prevlink = $thisurl.'&weekstart='.$prevweek;
+        $thisurl .= '&weekstart='.$weekstart;
+        
         $mform = new block_objectives_objectives_form($thisurl, array('timetables'=>$timetables, 'course'=>$this->course));
         
         // Load all the objectives for the selected week
         $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = '.$weekstart);
         $formdata = array();
+        $formdata['weekstart'] = $weekstart;
         if ($objectives) {
             foreach ($objectives as $obj) {
                 // TODO - will need to remove the 'completed' symbols from the start of each line
@@ -130,6 +135,38 @@ class block_objectives_class {
         if ($mform->is_cancelled()) {
             redirect($courseurl);
         }
+
+        if (($data = $mform->get_data()) && ($data->action == 'savesettings')) {
+            foreach ($data->obj as $timetableid=>$obj) {
+                $addnew = true;
+                if ($objectives) {
+                    foreach ($objectives as $dbobj) {
+                        if ($dbobj->timetableid == $timetableid) {
+                            $addnew = false;
+                            if (trim($obj) == '') {
+                                delete_records('objectives_objectives','id',$dbobj->id);
+                            } elseif ($dbobj->objectives != $obj) {
+                                $upd = new stdClass;
+                                $upd->id = $dbobj->id;
+                                $upd->objectives = $obj; // TODO add '-' to start of each line
+                                update_record('objectives_objectives',$upd);
+                            }
+                        }
+                    }
+                }
+                if ($addnew && trim($obj) != '') {
+                    $new = new stdClass;
+                    $new->timetableid = $timetableid;
+                    $new->weekstart = $weekstart;
+                    $new->objectives = $obj; // TODO add '-' to start of each line
+                    $new->id = insert_record('objectives_objectives',$new);
+                }
+            }
+            
+            if (isset($data->saveandcourse)) {
+                redirect($courseurl);
+            }
+        }
         
         $this->print_header();
         print_heading(get_string('editobjectives','block_objectives'));
@@ -140,12 +177,12 @@ class block_objectives_class {
         }
 
         // Output the week navigation options
-        $nextlink = $thisurl.'&weekstart='.$nextweek;
-        $prevlink = $thisurl.'&weekstart='.$prevweek;
         echo '<a href="'.$prevlink.'">&lt;&lt;&lt; '.get_string('prevweek','block_objectives').'</a> ';
         echo get_string('weekbegining','block_objectives').' <strong>'.userdate($weekstart, get_string('strftimedaydate')).'</strong>';
         echo ' <a href="'.$nextlink.'">'.get_string('nextweek','block_objectives').' &gt;&gt;&gt;</a>';
         print_simple_box_end();
+
+        print_string('editobjectivesinst','block_objectives');
         
         $mform->display();
         
@@ -365,6 +402,22 @@ class block_objectives_objectives_form extends moodleform {
             }
             $mform->addElement('textarea',"obj[{$lesson->id}]", $objlabel, array('cols'=>40,'rows'=>5));
         }
+
+        $mform->addElement('hidden', 'course', $course->id);
+        $mform->setType('course', PARAM_INT);
+
+        $mform->addElement('hidden', 'weekstart', 0);
+        $mform->setType('weekstart', PARAM_INT);
+
+        $mform->addElement('hidden', 'action', 'savesettings');
+        $mform->setType('action', PARAM_TEXT);
+
+        $buttons = array();
+        $buttons[] =& $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
+        $buttons[] =& $mform->createElement('submit', 'saveandcourse', get_string('saveandcourse','block_objectives'));
+        $buttons[] =& $mform->createElement('cancel');
+        $mform->addGroup($buttons, 'actionbuttons', '', array(' '), false);
+        $mform->closeHeaderBefore('actionbuttons');
     }
 }
 
