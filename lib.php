@@ -37,6 +37,23 @@ class block_objectives_class {
     function can_edit_timetables() { return has_capability('block/objectives:edittimetables', $this->context); }
     function can_checkoff_objectives() { return has_capability('block/objectives:checkofftimetables', $this->context); }
 
+    // Get timestamp for midnight Monday of the week containting $weekstart
+    function getweekstart($timestamp=0) {
+        if ($timestamp) {
+            $dateinfo = getdate($timestamp);
+        } else {
+            $dateinfo = getdate();
+        }
+
+        $wday = ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0
+        
+        // Work out midnight today
+        $weekstart = mktime(0,0,0,$dateinfo['mon'],$dateinfo['mday'],$dateinfo['year']);
+        $weekstart -= (24 * 60 * 60) * $wday; // Subtract number of days to get back to Monday
+
+        return $weekstart;
+    }
+
     function get_block_text() {
         if (!$this->can_view_objectives()) {
             return null;
@@ -59,7 +76,7 @@ class block_objectives_class {
         return null;
     }
 
-    function edit_objectives() {
+    function edit_objectives($weekstart = 0) {
         global $CFG;
         
         $caneditobjectives = $this->can_edit_objectives();
@@ -90,13 +107,27 @@ class block_objectives_class {
             }
         }
 
+        $weekstart = $this->getweekstart($weekstart);
+        $prevweek = $weekstart - (7 * 24 * 60 * 60);
+        $nextweek = $weekstart + (7 * 24 * 60 * 60);
+        
         $thisurl = $CFG->wwwroot.'/blocks/objectives/edit.php?viewtab=objectives&course='.$this->course->id;
         $mform = new block_objectives_objectives_form($thisurl);
         
         $this->print_header();
         print_heading(get_string('editobjectives','block_objectives'));
+        print_simple_box_start();
         $timetablesurl = $CFG->wwwroot.'/blocks/objectives/edit.php';;
         print_single_button($timetablesurl, array('viewtab'=>'timetables', 'course'=>$this->course->id), get_string('edittimetables','block_objectives'));
+
+        // Output the week navigation options
+        $nextlink = $thisurl.'&weekstart='.$nextweek;
+        $prevlink = $thisurl.'&weekstart='.$prevweek;
+        echo '<a href="'.$prevlink.'">&lt;&lt;&lt; '.get_string('prevweek','block_objectives').'</a> ';
+        echo get_string('weekbegining','block_objectives').' <strong>'.userdate($weekstart, get_string('strftimedaydate')).'</strong>';
+        echo ' <a href="'.$nextlink.'">'.get_string('nextweek','block_objectives').' &gt;&gt;&gt;</a>';
+        print_simple_box_end();
+        
         $mform->display();
         $this->print_footer();
     }

@@ -12,7 +12,10 @@ $string['lessonendminute'] = 'End minute';
 $string['lessonstart'] = 'Start';
 $string['lessonstarthour'] = 'Start hour';
 $string['lessonstartminute'] = 'Start minute';
+$string['nextweek'] = 'Next week';
 $string['pluginname'] = 'Lesson objectives';
+$string['prevweek'] = 'Previous week';
 $string['saveandobjectives'] = 'Save and edit objectives';
+$string['weekbegining'] = 'Week beginning';
 
 ?>
