@@ -6,7 +6,7 @@ class block_objectives_edit_form extends moodleform {
     function definition() {
         $mform =& $this->_form;
 
-        $mform->addElement('text', 'intro', get_string('introduction'), array('size' => 40));
+        $mform->addElement('text', 'intro', get_string('introduction','block_objectives'), array('size' => 40));
         
         $mform->addElement('hidden', 'objectivesid', 0);
         $mform->setType('objectivesid', PARAM_INT);
