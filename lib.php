@@ -37,7 +37,7 @@ class block_objectives_class {
     function can_edit_timetables() { return has_capability('block/objectives:edittimetables', $this->context); }
     function can_checkoff_objectives() { return has_capability('block/objectives:checkofftimetables', $this->context); }
 
-    // Get timestamp for midnight Monday of the week containting $weekstart
+    // Get timestamp for midnight Monday of the week containting $timestamp (or this week, if $timestamp is 0)
     function getweekstart($timestamp=0) {
         if ($timestamp) {
             $dateinfo = getdate($timestamp);
@@ -54,13 +54,99 @@ class block_objectives_class {
         return $weekstart;
     }
 
+    function getweekday($timestamp=0) {
+        if ($timestamp) {
+            $dateinfo = getdate($timestamp);
+        } else {
+            $dateinfo = getdate();
+        }
+
+        $wday = ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0
+        return $wday;
+    }
+
+    // Seconds since the start of today
+    function gettimenow($timestamp=0) {
+        if ($timestamp) {
+            $dateinfo = getdate($timestamp);
+        } else {
+            $dateinfo = getdate();
+        }
+
+        $timenow = (($dateinfo['hours']*60) + $dateinfo['minutes']) * 60 + $dateinfo['seconds'];
+        return $timenow;
+    }
+
     function get_block_text() {
+        global $USER, $CFG;
+
         if (!$this->can_view_objectives()) {
             return null;
         }
 
+        $weekstart = $this->getweekstart();
+        $day = $this->getweekday();
+        $timenow = $this->gettimenow();
+
+        $allgroups = $this->can_edit_objectives() || $this->can_checkoff_objectives();
+        
+        $userid = $USER->id;
+        if ($allgroups) {
+            $userid = 0;
+        }
+        $groups = groups_get_all_groups($this->course->id, $userid, 0, 'g.id, g.name');
+        $groups[0] = new stdClass;
+        $groups[0]->id = 0;
+        $groups[0]->name = get_string('allgroups');
+
+        $sql = 'SELECT o.objectives, t.starttime, t.endtime, t.groupid ';
+        $sql .= "FROM {$CFG->prefix}objectives_objectives o, {$CFG->prefix}objectives_timetable t ";
+        $sql .= 'WHERE o.timetableid = t.id AND o.weekstart = '.$weekstart;
+        $sql .= ' AND t.objectivesid = '.$this->settings->id.' AND t.day = '.$day.' AND t.starttime <= '.$timenow.' AND t.endtime > '.$timenow;
+        $sql .= ' AND t.groupid IN ('.implode(',',array_keys($groups)).')';
+        $objectives = get_records_sql($sql);
+
         $text = '<strong>'.userdate(time(), get_string('strftimedaydate')).'</strong><br/>';
-        $text .= s($this->settings->intro);
+
+        if (!$objectives) {
+            $text .= get_string('noobjectives','block_objectives');
+        } else {
+            if (count($objectives) > 1) {
+                // More than one eligible lesson with objectives - select the first one found that is not set to 'all groups'
+                // TODO - add a 'group select' dropdown
+                foreach ($objectives as $obj) {
+                    if ($obj->groupid > 0) {
+                        $objsel = $obj;
+                        break;
+                    }
+                }
+            } else {
+                // Only one eligiblw lesson with objectives - select it
+                $objsel = reset($objectives);
+            }
+            $objarray = explode("\n", $objsel->objectives);
+
+            
+            $text .= '<strong>'.userdate($objsel->starttime, get_string('strftimetime')).'-';
+            $text .= userdate($objsel->endtime, get_string('strftimetime')).'</strong><br/>';
+            $text .= s($this->settings->intro);
+            $text .= '<ul>';
+            foreach ($objarray as $obj) {
+                if (trim($obj) == '') {
+                    continue;
+                }
+                $indent = 0;
+                while ($indent < 2 && substr($obj, $indent, 1) == ' ') {
+                    $indent++;
+                    $text .= '<ul>';
+                }
+                $text .= '<li>'.s(trim($obj)).'</li>';
+                for ($i=0; $i<$indent; $i++) {
+                    $text .= '</ul>';
+                }
+            }
+            $text .= '</ul>';
+        }
 
         return $text;
     }
@@ -81,7 +167,7 @@ class block_objectives_class {
         
         $caneditobjectives = $this->can_edit_objectives();
         $canedittimetables = $this->can_edit_timetables();
-        $returl = $CFG->wwwroot.'/course/view.php?id='.$this->course->id;
+        $courseurl = $CFG->wwwroot.'/course/view.php?id='.$this->course->id;
 
         if (!$canedittimetables && !$caneditobjectives) {
             error('You do not have permission to change any lesson objective settings');
