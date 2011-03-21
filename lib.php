@@ -322,8 +322,12 @@ class block_objectives_timetable_form extends moodleform {
         $days = $custom['days'];
 
         $groups = groups_get_all_groups($course->id, 0, 0, 'g.id, g.name');
-        $groups[-1] = get_string('disable');
-        $groups[0] = get_string('allgroups');
+        $groupnames = array();
+        $groupnames[-1] = get_string('disable');
+        $groupnames[0] = get_string('allgroups');
+        foreach ($groups as $id=>$group) {
+            $groupnames[$id] = $group->name;
+        }
         $hours = array();
         for ($i=0; $i<24; $i++) {
             $hours[$i] = sprintf('%02d',$i);
@@ -338,7 +342,7 @@ class block_objectives_timetable_form extends moodleform {
             $mform->addElement('header', $day, get_string($day,'calendar'));
             foreach ($lessons as $lid) {
                 $lel = array();
-                $lel[] =& $mform->createElement('select', "lgroup[$lid]", get_string('group','block_objectives'), $groups);
+                $lel[] =& $mform->createElement('select', "lgroup[$lid]", get_string('group','block_objectives'), $groupnames);
                 $mform->setDefault("lgroup[$lid]", -1);
                 $lel[] =& $mform->createElement('static', null, '', '&nbsp;&nbsp;'.get_string('lessonstart', 'block_objectives'));
                 $lel[] =& $mform->createElement('select', "lstarthour[$lid]", get_string('lessonstarthour', 'block_objectives'), $hours);
