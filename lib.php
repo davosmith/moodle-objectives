@@ -35,7 +35,7 @@ class block_objectives_class {
     function can_view_objectives() { return has_capability('block/objectives:viewobjectives', $this->context); }
     function can_edit_objectives() { return has_capability('block/objectives:editobjectives', $this->context); }
     function can_edit_timetables() { return has_capability('block/objectives:edittimetables', $this->context); }
-    function can_checkoff_objectives() { return has_capability('block/objectives:checkofftimetables', $this->context); }
+    function can_checkoff_objectives() { return has_capability('block/objectives:checkoffobjectives', $this->context); }
 
     // Get timestamp for midnight Monday of the week containting $timestamp (or this week, if $timestamp is 0)
     function getweekstart($timestamp=0) {
@@ -363,7 +363,7 @@ class block_objectives_class {
                         if ($upd->groupid != $timetables[$lid]->groupid ||
                             $upd->starttime != $timetables[$lid]->starttime ||
                             $upd->endtime != $timetables[$lid]->endtime) {  // Something has changed
-                            if ($upd->day == $timetables[$lid] && $upd->objectivesid == $timetables[$lid]) {
+                            if ($upd->day == $timetables[$lid]->day && $upd->objectivesid == $timetables[$lid]->objectivesid) {
                                 update_record('objectives_timetable',$upd);
                             } else {
                                 $this->print_header();
