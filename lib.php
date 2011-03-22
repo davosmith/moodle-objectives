@@ -186,7 +186,6 @@ class block_objectives_class {
             }
             $objarray = explode("\n", $objsel->objectives);
 
-            
             $text .= '<strong>'.userdate($objsel->starttime, get_string('strftimetime')).'-';
             $text .= userdate($objsel->endtime, get_string('strftimetime')).'</strong><br/>';
             $text .= s($this->settings->intro);
@@ -221,6 +220,14 @@ class block_objectives_class {
         }
 
         return null;
+    }
+
+    function remove_checkedoff($obj) {
+        return preg_replace(array('/^\+/m','/^-/m'),'',$obj);
+    }
+
+    function add_not_checkedoff($obj) {
+        return preg_replace('/^(.)/m','-$1',$obj); // Start each line with '-' (incomplete)
     }
 
     function edit_objectives($weekstart = 0) {
@@ -272,8 +279,8 @@ class block_objectives_class {
         $formdata['weekstart'] = $weekstart;
         if ($objectives) {
             foreach ($objectives as $obj) {
-                // TODO - will need to remove the 'completed' symbols from the start of each line
-                $formdata["obj[{$obj->timetableid}]"] = $obj->objectives;
+                // Remove the 'completed' symbols from the start of each line
+                $formdata["obj[{$obj->timetableid}]"] = $this->remove_checkedoff($obj->objectives);
             }
         }
         
@@ -292,10 +299,10 @@ class block_objectives_class {
                             $addnew = false;
                             if (trim($obj) == '') {
                                 delete_records('objectives_objectives','id',$dbobj->id);
-                            } elseif ($dbobj->objectives != $obj) {
+                            } elseif ($this->remove_checkedoff($dbobj->objectives) != $obj) {
                                 $upd = new stdClass;
                                 $upd->id = $dbobj->id;
-                                $upd->objectives = $obj; // TODO add '-' to start of each line
+                                $upd->objectives = $this->add_not_checkedoff($obj);
                                 update_record('objectives_objectives',$upd);
                             }
                         }
@@ -305,7 +312,7 @@ class block_objectives_class {
                     $new = new stdClass;
                     $new->timetableid = $timetableid;
                     $new->weekstart = $weekstart;
-                    $new->objectives = $obj; // TODO add '-' to start of each line
+                    $new->objectives = $this->add_not_checkedoff($obj);
                     $new->id = insert_record('objectives_objectives',$new);
                 }
             }
