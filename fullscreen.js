@@ -5,7 +5,7 @@ lesson_objectives.add_fs_objective = function ($complete, $text) {
 };
 
 lesson_objectives.show_fullscreen = function () {
-    alert('fullscreen');
+    alert('Not yet implemented');
 };
 
 lesson_objectives.init_fullscreen = function(icon, alt) {
