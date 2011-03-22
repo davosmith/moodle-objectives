@@ -144,6 +144,8 @@ class block_objectives_class {
             return null;
         }
 
+        $cancheckoff = $this->can_checkoff_objectives();
+
         $weekstart = $this->getweekstart();
         $day = $this->getweekday();
         $timenow = $this->gettimenow();
@@ -163,7 +165,7 @@ class block_objectives_class {
         $allgroups->name = get_string('allgroups');
         $groups[0] = $allgroups;
 
-        $sql = 'SELECT o.objectives, t.starttime, t.endtime, t.groupid ';
+        $sql = 'SELECT o.id, o.objectives, t.starttime, t.endtime, t.groupid ';
         $sql .= "FROM {$CFG->prefix}objectives_objectives o, {$CFG->prefix}objectives_timetable t ";
         $sql .= 'WHERE o.timetableid = t.id AND o.weekstart = '.$weekstart;
         $sql .= ' AND t.objectivesid = '.$this->settings->id.' AND t.day = '.$day.' AND t.starttime <= '.$timenow.' AND t.endtime > '.$timenow;
@@ -188,10 +190,44 @@ class block_objectives_class {
             $icons = array('+'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/tick_box.gif" alt="'.get_string('complete','block_objectives').'" />',
                            '-'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/empty_box.gif" alt="'.get_string('incomplete','block_objectives').'" />');
 
+            if ($cancheckoff) {
+                $link = array('+'=>'<a href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;incomplete_objective='.$objsel->id.':%d" >',
+                              '-'=>'<a href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;complete_objective='.$objsel->id.':%d" >');
+            }
+
+            if ($cancheckoff) {
+                $incompleteobj = optional_param('incomplete_objective',false,PARAM_TEXT);
+                $completeobj = optional_param('complete_objective',false,PARAM_TEXT);
+                if ($incompleteobj) {
+                    $toupdate = explode(':',$incompleteobj);
+                    if ($toupdate[0] == $objsel->id) {
+                        if (array_key_exists($toupdate[1], $objarray)) {
+                            $objarray[$toupdate[1]] = '-'.substr($objarray[$toupdate[1]], 1);
+                            $upd = new stdClass;
+                            $upd->id = $objsel->id;
+                            $upd->objectives = implode("\n",$objarray);
+                            update_record('objectives_objectives',$upd);
+                        }
+                    }
+                } elseif ($completeobj) {
+                    $toupdate = explode(':',$completeobj);
+                    if ($toupdate[0] == $objsel->id) {
+                        if (array_key_exists($toupdate[1], $objarray)) {
+                            $objarray[$toupdate[1]] = '+'.substr($objarray[$toupdate[1]], 1);
+                            $upd = new stdClass;
+                            $upd->id = $objsel->id;
+                            $upd->objectives = implode("\n",$objarray);
+                            update_record('objectives_objectives',$upd);
+                        }
+                    }
+                }
+            }
+        
             $text .= '<strong>'.userdate($objsel->starttime, get_string('strftimetime')).'-';
             $text .= userdate($objsel->endtime, get_string('strftimetime')).'</strong><br/>';
             $text .= s($this->settings->intro);
             $text .= '<ul class="lesson_objectives_list">';
+            $idx = 0;
             foreach ($objarray as $obj) {
                 $complete = substr($obj, 0, 1);
                 $obj = substr($obj,1);
@@ -206,10 +242,19 @@ class block_objectives_class {
                     $indent++;
                     $text .= '<ul>';
                 }
-                $text .= '<li>'.$icons[$complete].s(trim($obj)).'</li>';
+                $text .= '<li>';
+                if ($cancheckoff) { // Add a 'check-off' link
+                    $text .= sprintf($link[$complete], $idx);
+                }
+                $text .= $icons[$complete].s(trim($obj));
+                if ($cancheckoff) {
+                    $text .= '</a>';
+                }
+                $text .= '</li>';
                 for ($i=0; $i<$indent; $i++) {
                     $text .= '</ul>';
                 }
+                $idx++;
             }
             $text .= '</ul>';
             $text .= $groupsmenu;
