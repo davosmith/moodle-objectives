@@ -1,4 +1,4 @@
-.lesson_objectives_list {
+.lesson_objectives_list, .lesson_objectives_list ul {
     list-style-type: none;
     padding-left: 1em;
  }

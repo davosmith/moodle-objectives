@@ -177,7 +177,7 @@ class block_objectives_class {
         if (!$objectives) {
             $text .= '<br/>'.get_string('noobjectives','block_objectives');
         } else {
-            require_js($CFG->wwwroot.'/blocks/objectives/fullscreen.js');
+            require_js($CFG->wwwroot.'/blocks/objectives/objectives.js');
 
             $groupsmenu = '';
             if (count($objectives) > 1) {
