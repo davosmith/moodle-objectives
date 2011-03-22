@@ -172,11 +172,13 @@ class block_objectives_class {
         $sql .= ' AND t.groupid IN ('.implode(',',array_keys($groups)).')';
         $objectives = get_records_sql($sql);
 
-        $text = '<strong>'.userdate(time(), get_string('strftimedaydate')).'</strong><br/>';
+        $text = '<strong>'.userdate(time(), get_string('strftimedaydate')).'</strong>';
 
         if (!$objectives) {
-            $text .= get_string('noobjectives','block_objectives');
+            $text .= '<br/>'.get_string('noobjectives','block_objectives');
         } else {
+            require_js($CFG->wwwroot.'/blocks/objectives/fullscreen.js');
+
             $groupsmenu = '';
             if (count($objectives) > 1) {
                 // More than one eligible lesson with objectives - select the best one and display a menu to choose further
@@ -222,7 +224,9 @@ class block_objectives_class {
                     }
                 }
             }
-        
+
+            $text .= '<span id="lesson_objectives_fullscreen" style="float:right;"></span>';
+            $text .= '<br/>';
             $text .= '<strong>'.userdate($objsel->starttime, get_string('strftimetime')).'-';
             $text .= userdate($objsel->endtime, get_string('strftimetime')).'</strong><br/>';
             $text .= s($this->settings->intro);
@@ -258,6 +262,8 @@ class block_objectives_class {
             }
             $text .= '</ul>';
             $text .= $groupsmenu;
+            $fsicon = $CFG->wwwroot.'/blocks/objectives/pix/fullscreen_maximize.gif';
+            $text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'");</script>';
         }
 
         return $text;
