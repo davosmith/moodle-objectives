@@ -225,7 +225,9 @@ class block_objectives_class {
                 }
             }
 
-            $text .= '<span id="lesson_objectives_fullscreen" style="float:right;"></span>';
+            $fshtml = 'This will display the lesson objectives (just not yet)';
+                        
+            $text .= '<span id="lesson_objectives_fullscreen_icon" style="float:right;"></span>';
             $text .= '<br/>';
             $text .= '<strong>'.userdate($objsel->starttime, get_string('strftimetime')).'-';
             $text .= userdate($objsel->endtime, get_string('strftimetime')).'</strong><br/>';
@@ -263,7 +265,7 @@ class block_objectives_class {
             $text .= '</ul>';
             $text .= $groupsmenu;
             $fsicon = $CFG->wwwroot.'/blocks/objectives/pix/fullscreen_maximize.gif';
-            $text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'");</script>';
+            $text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'","'.$fshtml.'");</script>';
         }
 
         return $text;
