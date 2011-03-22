@@ -24,7 +24,7 @@ class block_objectives_class {
             $this->settings = new stdClass;
             $this->settings->course = $course->id;
             $this->settings->intro = get_string('defaultintro','block_objectives');
-            $this->settings->id = insert_record('objectives',$settings);
+            $this->settings->id = insert_record('objectives',$this->settings);
         }
 
         $this->context = get_context_instance(CONTEXT_COURSE, $course->id);
@@ -77,6 +77,66 @@ class block_objectives_class {
         return $timenow;
     }
 
+    // Select the objectives that match the selected group (or select a new one if no suitable objectives)
+    function selected_group($objectives) {
+        global $SESSION;
+
+        if (!$objectives) {
+            return false;
+        }
+
+        if (count($objectives) == 1) {
+            return reset($objectives);
+        }
+
+        if (!isset($SESSION->objectives_group)) {
+            $SESSION->objectives_group = array(); // Create the SESSION array, if it doesn't already exist
+        }
+        $changegroup = optional_param('objectives_group', -1, PARAM_INT);
+        if ($changegroup != -1) {
+            foreach ($objectives as $obj) {
+                if ($obj->groupid == $changegroup) {
+                    $SESSION->objectives_group[$this->course->id] = $changegroup;
+                    return $obj;  // Objectives exist for newly selected group => return them
+                }
+            }
+        }
+        if (array_key_exists($this->course->id, $SESSION->objectives_group)) {
+            $lastgroup = $SESSION->objectives_group[$this->course->id];
+            foreach ($objectives as $obj) {
+                if ($obj->groupid == $lastgroup) {
+                    return $obj;  // Objectives exist for last selected group => return them
+                }
+            }
+        }
+        // No lastgroup, or no objectives for that group - select most suitable objectives
+        foreach ($objectives as $obj) {
+            if ($obj->groupid != 0) {
+                $SESSION->objectives_group[$this->course->id] = $obj->groupid;
+                return $obj;
+            }
+        }
+
+        return reset($objectives);  // Should not reach here, but just in case...
+    }
+
+    function groups_menu($objectives, $groups) {
+        global $CFG;
+
+        if (count($objectives) < 2) {
+            return '';
+        }
+
+        $selected = $this->selected_group($objectives);
+
+        $groupsmenu = array();
+        foreach ($objectives as $obj) {
+            $groupsmenu[$obj->groupid] = $groups[$obj->groupid]->name;
+        }
+        
+        return get_string('view').': '.popup_form($CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;objectives_group=', $groupsmenu, 'selectobjgroup', $selected->groupid, '', '', '', true);
+    }
+
     function get_block_text() {
         global $USER, $CFG;
 
@@ -88,16 +148,20 @@ class block_objectives_class {
         $day = $this->getweekday();
         $timenow = $this->gettimenow();
 
-        $allgroups = $this->can_edit_objectives() || $this->can_checkoff_objectives();
+        $allgroups = has_capability('moodle/site:accessallgroups', $this->context);
         
         $userid = $USER->id;
         if ($allgroups) {
             $userid = 0;
         }
         $groups = groups_get_all_groups($this->course->id, $userid, 0, 'g.id, g.name');
-        $groups[0] = new stdClass;
-        $groups[0]->id = 0;
-        $groups[0]->name = get_string('allgroups');
+        if (!$groups) {
+            $groups = array();
+        }
+        $allgroups = new stdClass;
+        $allgroups->id = 0;
+        $allgroups->name = get_string('allgroups');
+        $groups[0] = $allgroups;
 
         $sql = 'SELECT o.objectives, t.starttime, t.endtime, t.groupid ';
         $sql .= "FROM {$CFG->prefix}objectives_objectives o, {$CFG->prefix}objectives_timetable t ";
@@ -111,15 +175,11 @@ class block_objectives_class {
         if (!$objectives) {
             $text .= get_string('noobjectives','block_objectives');
         } else {
+            $groupsmenu = '';
             if (count($objectives) > 1) {
-                // More than one eligible lesson with objectives - select the first one found that is not set to 'all groups'
-                // TODO - add a 'group select' dropdown
-                foreach ($objectives as $obj) {
-                    if ($obj->groupid > 0) {
-                        $objsel = $obj;
-                        break;
-                    }
-                }
+                // More than one eligible lesson with objectives - select the best one and display a menu to choose further
+                $objsel = $this->selected_group($objectives);
+                $groupsmenu = $this->groups_menu($objectives, $groups);
             } else {
                 // Only one eligiblw lesson with objectives - select it
                 $objsel = reset($objectives);
@@ -146,6 +206,7 @@ class block_objectives_class {
                 }
             }
             $text .= '</ul>';
+            $text .= $groupsmenu;
         }
 
         return $text;
@@ -411,8 +472,10 @@ class block_objectives_timetable_form extends moodleform {
         $groupnames = array();
         $groupnames[-1] = get_string('disable');
         $groupnames[0] = get_string('allgroups');
-        foreach ($groups as $id=>$group) {
-            $groupnames[$id] = $group->name;
+        if ($groups) {
+            foreach ($groups as $id=>$group) {
+                $groupnames[$id] = $group->name;
+            }
         }
         $hours = array();
         for ($i=0; $i<24; $i++) {
