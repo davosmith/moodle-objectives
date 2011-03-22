@@ -185,21 +185,28 @@ class block_objectives_class {
                 $objsel = reset($objectives);
             }
             $objarray = explode("\n", $objsel->objectives);
+            $icons = array('+'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/tick_box.gif" alt="'.get_string('complete','block_objectives').'" />',
+                           '-'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/empty_box.gif" alt="'.get_string('incomplete','block_objectives').'" />');
 
             $text .= '<strong>'.userdate($objsel->starttime, get_string('strftimetime')).'-';
             $text .= userdate($objsel->endtime, get_string('strftimetime')).'</strong><br/>';
             $text .= s($this->settings->intro);
-            $text .= '<ul>';
+            $text .= '<ul class="lesson_objectives_list">';
             foreach ($objarray as $obj) {
+                $complete = substr($obj, 0, 1);
+                $obj = substr($obj,1);
                 if (trim($obj) == '') {
                     continue;
+                }
+                if ($complete != '+') {
+                    $complete = '-';
                 }
                 $indent = 0;
                 while ($indent < 2 && substr($obj, $indent, 1) == ' ') {
                     $indent++;
                     $text .= '<ul>';
                 }
-                $text .= '<li>'.s(trim($obj)).'</li>';
+                $text .= '<li>'.$icons[$complete].s(trim($obj)).'</li>';
                 for ($i=0; $i<$indent; $i++) {
                     $text .= '</ul>';
                 }
