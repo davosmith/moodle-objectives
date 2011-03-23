@@ -25,7 +25,7 @@ lesson_objectives.hide_fullscreen = function () {
 lesson_objectives.init_fullscreen = function(icon, alt, fshtml) {
     var el = document.getElementById('lesson_objectives_fullscreen_icon');
     if (el) {
-	el.innerHTML = '<a href="#" onclick="lesson_objectives.show_fullscreen()"><img src="'+icon+'" alt="'+alt+'" /></a>';
+	//el.innerHTML = '<a href="#" onclick="lesson_objectives.show_fullscreen()"><img src="'+icon+'" alt="'+alt+'" /></a>';
     }
     lesson_objectives.fshtml = fshtml;
 };
