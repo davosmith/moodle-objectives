@@ -10,14 +10,12 @@
     color: black;
 }
 
-#lesson_objectives_fullscreen_div {
-    position: absolute; 
-    top: 5%; 
-    left: 5%; 
-    height: 90%; 
-    width: 90%; 
-    border: solid black 4px; 
-    background-color: white; 
-    z-index: 5000;
+.lesson_objectives_fullscreen_area {
     font-size: 3em;
 }
+
+.lesson_objectives_fullscreen_area img {
+    width: 1em;
+    height: 1em;
+}
+

@@ -177,7 +177,7 @@ class block_objectives_class {
         if (!$objectives) {
             $text .= '<br/>'.get_string('noobjectives','block_objectives');
         } else {
-            require_js($CFG->wwwroot.'/blocks/objectives/objectives.js');
+            require_js(array('yui_yahoo','yui_dom-event','yui_container','yui_animation',$CFG->wwwroot.'/blocks/objectives/objectives.js'));
 
             $groupsmenu = '';
             if (count($objectives) > 1) {
@@ -225,14 +225,12 @@ class block_objectives_class {
                 }
             }
 
-            $fshtml = 'This will display the lesson objectives (just not yet)';
-                        
             $text .= '<span id="lesson_objectives_fullscreen_icon" style="float:right;"></span>';
             $text .= '<br/>';
-            $text .= '<strong>'.userdate($objsel->starttime, get_string('strftimetime')).'-';
-            $text .= userdate($objsel->endtime, get_string('strftimetime')).'</strong><br/>';
-            $text .= s($this->settings->intro);
-            $text .= '<ul class="lesson_objectives_list">';
+            $objtext = '<strong>'.userdate($objsel->starttime, get_string('strftimetime')).'-';
+            $objtext .= userdate($objsel->endtime, get_string('strftimetime')).'</strong><br/>';
+            $objtext .= s($this->settings->intro);
+            $objtext .= '<ul class="lesson_objectives_list">';
             $idx = 0;
             foreach ($objarray as $obj) {
                 $complete = substr($obj, 0, 1);
@@ -246,26 +244,35 @@ class block_objectives_class {
                 $indent = 0;
                 while ($indent < 2 && substr($obj, $indent, 1) == ' ') {
                     $indent++;
-                    $text .= '<ul>';
+                    $objtext .= '<ul>';
                 }
-                $text .= '<li>';
+                $objtext .= '<li>';
                 if ($cancheckoff) { // Add a 'check-off' link
-                    $text .= sprintf($link[$complete], $idx);
+                    $objtext .= sprintf($link[$complete], $idx);
                 }
-                $text .= $icons[$complete].s(trim($obj));
+                $objtext .= $icons[$complete].s(trim($obj));
                 if ($cancheckoff) {
-                    $text .= '</a>';
+                    $objtext .= '</a>';
                 }
-                $text .= '</li>';
+                $objtext .= '</li>';
                 for ($i=0; $i<$indent; $i++) {
-                    $text .= '</ul>';
+                    $objtext .= '</ul>';
                 }
                 $idx++;
             }
-            $text .= '</ul>';
+            $objtext .= '</ul>';
+            $text .= $objtext;
+            
+            $fshtml = '<div id="lesson_objectives_fullscreen_text" style="display:none;"><div class="lesson_objectives_fullscreen_area">';
+            $fshtml .= preg_replace('/(href="[^"]*)"/i','$1&lesson_objectives_fullscreen=1"', $objtext);
+            $fshtml .= '</div></div>';
+
+            $text .= $fshtml;
             $text .= $groupsmenu;
+            
+            $startfull = optional_param('lesson_objectives_fullscreen',0,PARAM_INT);
             $fsicon = $CFG->wwwroot.'/blocks/objectives/pix/fullscreen_maximize.gif';
-            $text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'","'.$fshtml.'");</script>';
+            $text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'","'.$startfull.'");</script>';
         }
 
         return $text;
