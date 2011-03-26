@@ -16,8 +16,23 @@ Other features include:
 3. Create a folder on your server '<moodle root>/blocks/objectives'
 4. Upload all the files in the 'davosmith-moodle-objectives-XXXXX' folder into this blocks/objectives folder on the server.
 5. Log in as an administrator and click on the 'Notifications' link.
+6. Go into a course, turn on editing and choose 'Lesson objectives' from the 'Add a block' menu
+
+==Usage==
+
+Click on 'Edit objectives ...' in the footer of the block.
+The first time, this will take you directly to the 'Edit timetables' screen (there is a button at the top of the 'Edit objectives' page to get back here later).
+For each slot in the timetable, choose a group to display the objectives to (or 'all groups', for everyone on the course), as well as a start / end time for that lesson.
+Three blank slots are added to each day every time you click 'Save'.
+Once the timetable slots are filled in, click 'Save and edit objectives', to start entering lesson objectives.
+
+Type in the lesson objectives for each lesson slot, press enter to start a new objective; start a line with one (or two) spaces to indent the objectives.
+Click on 'Save' before moving to another week (via the next / previous links at the top of the page).
+Click 'Save and view course' to get back to the course.
+
+During a lesson, a teacher can click on an objective to toggle the 'tick' box between completed / not completed (this is just to help keep track of the progress through the lesson and does not affect anything else).
 
 ==Contact==
 
-Any questions, please drop an email to "davo AT davodev DOT co DOT uk" or visit http://www.davodev.co.uk
+Any questions or suggestions for improvement, please drop an email to "davo AT davodev DOT co DOT uk" or visit http://www.davodev.co.uk
 
