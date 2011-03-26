@@ -78,7 +78,7 @@ class block_objectives_class {
     }
 
     // Select the objectives that match the selected group (or select a new one if no suitable objectives)
-    function selected_group($objectives) {
+    function objectives_for_selected_group($objectives) {
         global $SESSION;
 
         if (!$objectives) {
@@ -182,7 +182,7 @@ class block_objectives_class {
             $groupsmenu = '';
             if (count($objectives) > 1) {
                 // More than one eligible lesson with objectives - select the best one and display a menu to choose further
-                $objsel = $this->selected_group($objectives);
+                $objsel = $this->objectives_for_selected_group($objectives);
                 $groupsmenu = $this->groups_menu($objectives, $groups);
             } else {
                 // Only one eligiblw lesson with objectives - select it
@@ -281,12 +281,128 @@ class block_objectives_class {
     function get_block_footer() {
         global $CFG;
         
+        $edittext = '';
         if ($this->can_edit_timetables() || $this->can_edit_objectives()) {
             $editlink = $CFG->wwwroot.'/blocks/objectives/edit.php?course='.$this->settings->course;
-            return '<a href="'.$editlink.'">'.get_string('editobjectives', 'block_objectives').'</a>';
+            $edittext =  '<a href="'.$editlink.'">'.get_string('editobjectives', 'block_objectives').' &hellip;</a><br/>';
         }
+        $viewlink = $CFG->wwwroot.'/blocks/objectives/view.php?course='.$this->settings->course;
+        return $edittext.'<a href="'.$viewlink.'">'.get_string('viewobjectives', 'block_objectives').' &hellip;</a>';
 
         return null;
+    }
+
+    function view_objectives($weekstart = 0) {
+        global $CFG, $USER;
+
+        if (!$this->can_view_objectives()) {
+            redirect($CFG->wwwroot.'/course/view.php/id='.$this->course->id);
+        }
+
+        $weekstart = $this->getweekstart($weekstart);
+        $prevweek = $weekstart - (7 * 24 * 60 * 60);
+        $nextweek = $weekstart + (7 * 24 * 60 * 60);
+
+        $thisurl = $CFG->wwwroot.'/blocks/objectives/view.php?viewtab=objectives&course='.$this->course->id;
+        $nextlink = $thisurl.'&weekstart='.$nextweek;
+        $prevlink = $thisurl.'&weekstart='.$prevweek;
+        $thisurl .= '&weekstart='.$weekstart;
+
+        // Load all the objectives for the selected week
+        $allgroups = has_capability('moodle/site:accessallgroups', $this->context);
+        
+        $userid = $USER->id;
+        if ($allgroups) {
+            $userid = 0;
+        }
+        $groups = groups_get_all_groups($this->course->id, $userid, 0, 'g.id, g.name');
+        if (!$groups) {
+            $groups = array();
+        }
+        $allgroups = new stdClass;
+        $allgroups->id = 0;
+        $allgroups->name = get_string('allgroups');
+        $groups[0] = $allgroups;
+
+        $timetables = get_records_select('objectives_timetable', "objectivesid = {$this->settings->id} AND groupid IN (".implode(',',array_keys($groups)).')', 'day, starttime, groupid');
+        $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = '.$weekstart);
+
+        if ($objectives) {
+            foreach ($objectives as $obj) {
+                $timetables[$obj->timetableid]->objectives = $obj->objectives;
+            }
+        }
+
+        $num2day = array('monday','tuesday','wednesday','thursday','friday','saturday','sunday');
+        $icons = array('+'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/tick_box.gif" alt="'.get_string('complete','block_objectives').'" />',
+                       '-'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/empty_box.gif" alt="'.get_string('incomplete','block_objectives').'" />');
+
+        $this->print_header();
+        print_heading(get_string('viewobjectives','block_objectives'));
+
+        // Output the week navigation options
+        print_simple_box_start();
+        echo '<a href="'.$prevlink.'">&lt;&lt;&lt; '.get_string('prevweek','block_objectives').'</a> ';
+        echo get_string('weekbegining','block_objectives').' <strong>'.userdate($weekstart, get_string('strftimedaydate')).'</strong>';
+        echo ' <a href="'.$nextlink.'">'.get_string('nextweek','block_objectives').' &gt;&gt;&gt;</a>';
+        print_simple_box_end();
+
+        print_simple_box_start();
+        echo '<table class="lesson_objectives_table">';
+        $lastday = -1;
+        $oddrow = true;
+        foreach ($timetables as $lesson) {
+            echo '<tr class="'.($oddrow ? 'oddrow' : 'evenrow').'" >';
+            if ($lastday != $lesson->day) {
+                echo '<td><strong>'.get_string($num2day[$lesson->day],'calendar').'</strong></td>';
+                $lastday = $lesson->day;
+            } else {
+                echo '<td>&nbsp;</td>';
+            }
+            echo '<td>';
+            echo userdate($lesson->starttime, get_string('strftimetime')).'-';
+            echo userdate($lesson->endtime, get_string('strftimetime'));
+            if ($lesson->groupid > 0) {
+                echo ' ('.$groups[$lesson->groupid]->name.')';
+            }
+            echo '</td><td>';
+            if (isset($lesson->objectives)) {
+                $objarray = explode("\n", $lesson->objectives);
+                $objtext = '<ul class="lesson_objectives_list">';
+                foreach ($objarray as $obj) {
+                    $complete = substr($obj, 0, 1);
+                    $obj = substr($obj,1);
+                    if (trim($obj) == '') {
+                        continue;
+                    }
+                    if ($complete != '+') {
+                        $complete = '-';
+                    }
+                    $indent = 0;
+                    while ($indent < 2 && substr($obj, $indent, 1) == ' ') {
+                        $indent++;
+                        $objtext .= '<ul>';
+                    }
+                    $objtext .= '<li>';
+                    $objtext .= $icons[$complete].s(trim($obj));
+                    $objtext .= '</li>';
+                    for ($i=0; $i<$indent; $i++) {
+                        $objtext .= '</ul>';
+                    }
+                }
+                $objtext .= '</ul>';
+                
+                echo $objtext;
+            } else {
+                echo '&nbsp;';
+            }
+            echo '</td></tr>';
+            $oddrow = !$oddrow;
+        }
+        echo '</table>';
+        print_simple_box_end();
+        
+        $this->print_footer();
     }
 
     function remove_checkedoff($obj) {

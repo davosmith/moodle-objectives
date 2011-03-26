@@ -23,6 +23,7 @@ $string['pluginname'] = 'Lesson objectives';
 $string['prevweek'] = 'Previous week';
 $string['saveandcourse'] = 'Save and return to course';
 $string['saveandobjectives'] = 'Save and edit objectives';
+$string['viewobjectives'] = 'View objectives';
 $string['weekbegining'] = 'Week beginning';
 
 ?>

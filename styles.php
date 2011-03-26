@@ -19,3 +19,11 @@
     height: 1em;
 }
 
+.lesson_objectives_table td {
+    vertical-align: text-top;
+    padding: 10px;
+}
+
+.lesson_objectives_table .oddrow {
+    background-color: #d0d0d0;
+}
