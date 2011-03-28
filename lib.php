@@ -10,21 +10,26 @@ class block_objectives_class {
     var $course;
 
     function block_objectives_class($course) {
+        global $DB;
+
         if (is_int($course)) {
-            $course = get_record('course','id',$course);
+            //UT
+            $course = $DB->get_record('course',array('id'=>$course));
             if (!$course) {
+                //UT
                 error('Invalid course id');
             }
         }
 
         $this->course = $course;
         
-        $this->settings = get_record('objectives','course',$course->id);
+        $this->settings = $DB->get_record('objectives',array('course'=>$course->id));
         if (!$this->settings) {
+            //UT
             $this->settings = new stdClass;
             $this->settings->course = $course->id;
             $this->settings->intro = get_string('defaultintro','block_objectives');
-            $this->settings->id = insert_record('objectives',$this->settings);
+            $this->settings->id = $B->insert_record('objectives',$this->settings);
         }
 
         $this->context = get_context_instance(CONTEXT_COURSE, $course->id);
@@ -121,8 +126,6 @@ class block_objectives_class {
     }
 
     function groups_menu($objectives, $groups) {
-        global $CFG;
-
         if (count($objectives) < 2) {
             return '';
         }
@@ -133,16 +136,21 @@ class block_objectives_class {
         foreach ($objectives as $obj) {
             $groupsmenu[$obj->groupid] = $groups[$obj->groupid]->name;
         }
-        
-        return get_string('view').': '.popup_form($CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;objectives_group=', $groupsmenu, 'selectobjgroup', $selected->groupid, '', '', '', true);
+
+        $baseurl = new moodle_url('/course/view.php',array('id'=>$this->course->id));
+
+        //UT
+        return get_string('view').': '.$OUTPUT->single_select($baseurl, 'objecitves_group', $groupsmenu, $selected->groupid);
     }
 
     function get_block_text() {
-        global $USER, $CFG;
+        global $USER, $DB;
 
         if (!$this->can_view_objectives()) {
             return null;
         }
+
+        $courseurl = new moodle_url('/course/view.php',array('id'=>$this->course->id));
 
         $cancheckoff = $this->can_checkoff_objectives();
 
@@ -165,19 +173,23 @@ class block_objectives_class {
         $allgroups->name = get_string('allgroups');
         $groups[0] = $allgroups;
 
+        //UT
+        list($gsql, $gparam) = $DB->get_in_or_equal(array_keys($groups));
         $sql = 'SELECT o.id, o.objectives, t.starttime, t.endtime, t.groupid ';
-        $sql .= "FROM {$CFG->prefix}objectives_objectives o, {$CFG->prefix}objectives_timetable t ";
-        $sql .= 'WHERE o.timetableid = t.id AND o.weekstart = '.$weekstart;
-        $sql .= ' AND t.objectivesid = '.$this->settings->id.' AND t.day = '.$day.' AND t.starttime <= '.$timenow.' AND t.endtime > '.$timenow;
-        $sql .= ' AND t.groupid IN ('.implode(',',array_keys($groups)).')';
-        $objectives = get_records_sql($sql);
+        $sql .= "FROM {objectives_objectives} o, {objectives_timetable} t ";
+        $sql .= 'WHERE o.timetableid = t.id AND o.weekstart = ?';
+        $sql .= ' AND t.objectivesid = ? AND t.day = ? AND t.starttime <= ? AND t.endtime > ?';
+        $sql .= ' AND t.groupid '.$gsql;
+        $params = array_merge(array($weekstart, $this->settings->id, $day, $timenow, $timenow), $gparam);
+        $objectives = $DB->get_records_sql($sql, $params);
 
         $text = '<strong>'.userdate(time(), get_string('strftimedaydate')).'</strong>';
 
         if (!$objectives) {
             $text .= '<br/>'.get_string('noobjectives','block_objectives');
         } else {
-            require_js(array('yui_yahoo','yui_dom-event','yui_container','yui_animation',$CFG->wwwroot.'/blocks/objectives/objectives.js'));
+            //FIXME - get JS working
+            //require_js(array('yui_yahoo','yui_dom-event','yui_container','yui_animation',$CFG->wwwroot.'/blocks/objectives/objectives.js'));
 
             $groupsmenu = '';
             if (count($objectives) > 1) {
@@ -188,13 +200,15 @@ class block_objectives_class {
                 // Only one eligiblw lesson with objectives - select it
                 $objsel = reset($objectives);
             }
+            //UT
             $objarray = explode("\n", $objsel->objectives);
-            $icons = array('+'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/tick_box.gif" alt="'.get_string('complete','block_objectives').'" />',
-                           '-'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/empty_box.gif" alt="'.get_string('incomplete','block_objectives').'" />');
+            $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objecitves').'" alt="'.get_string('complete','block_objectives').'" />',
+                           '-'=>'<img src="'.$OUTPUT->pix_url('empty_box.gif','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
 
             if ($cancheckoff) {
-                $link = array('+'=>'<a href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;incomplete_objective='.$objsel->id.':%d" >',
-                              '-'=>'<a href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;complete_objective='.$objsel->id.':%d" >');
+                //UT
+                $link = array('+'=>'<a href="'.$courseurl->output(array('incomplete_objective'=>$objsel->id.':%d')).'" >',
+                              '-'=>'<a href="'.$courseurl->output(array('complete_objective'=>$objsel->id.':%d')).'" >');
             }
 
             if ($cancheckoff) {
@@ -208,7 +222,7 @@ class block_objectives_class {
                             $upd = new stdClass;
                             $upd->id = $objsel->id;
                             $upd->objectives = implode("\n",$objarray);
-                            update_record('objectives_objectives',$upd);
+                            $DB->update_record('objectives_objectives',$upd);
                         }
                     }
                 } elseif ($completeobj) {
@@ -219,7 +233,7 @@ class block_objectives_class {
                             $upd = new stdClass;
                             $upd->id = $objsel->id;
                             $upd->objectives = implode("\n",$objarray);
-                            update_record('objectives_objectives',$upd);
+                            $DB->update_record('objectives_objectives',$upd);
                         }
                     }
                 }
@@ -248,6 +262,7 @@ class block_objectives_class {
                 }
                 $objtext .= '<li>';
                 if ($cancheckoff) { // Add a 'check-off' link
+                    //UT
                     $objtext .= sprintf($link[$complete], $idx);
                 }
                 $objtext .= $icons[$complete].s(trim($obj));
@@ -263,8 +278,9 @@ class block_objectives_class {
             $objtext .= '</ul>';
             $text .= $objtext;
             
+            //UT
             $fshtml = '<div id="lesson_objectives_fullscreen_text" style="display:none;"><div class="lesson_objectives_fullscreen_area">';
-            $fshtml .= preg_replace('/(href="[^"]*)"/i','$1&lesson_objectives_fullscreen=1"', $objtext);
+            $fshtml .= preg_replace('/(href="[^"]*)"/i','$1&amp;lesson_objectives_fullscreen=1"', $objtext);
             $fshtml .= '</div></div>';
 
             $text .= $fshtml;
@@ -272,41 +288,39 @@ class block_objectives_class {
             
             $startfull = optional_param('lesson_objectives_fullscreen',0,PARAM_INT);
             $fsicon = $CFG->wwwroot.'/blocks/objectives/pix/fullscreen_maximize.gif';
-            $text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'","'.$startfull.'");</script>';
+            //FIXME - get JS working
+            //$text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'","'.$startfull.'");</script>';
         }
 
         return $text;
     }
 
     function get_block_footer() {
-        global $CFG;
-        
         $edittext = '';
         if ($this->can_edit_timetables() || $this->can_edit_objectives()) {
-            $editlink = $CFG->wwwroot.'/blocks/objectives/edit.php?course='.$this->settings->course;
+            $editlink = new moodle_url('/blocks/objectives/edit.php',array('course'=>$this->settings->course));
             $edittext =  '<a href="'.$editlink.'">'.get_string('editobjectives', 'block_objectives').' &hellip;</a><br/>';
         }
-        $viewlink = $CFG->wwwroot.'/blocks/objectives/view.php?course='.$this->settings->course;
+        $viewlink = new moodle_url('/blocks/objectives/view.php',array('course'=>$this->settings->course));
         return $edittext.'<a href="'.$viewlink.'">'.get_string('viewobjectives', 'block_objectives').' &hellip;</a>';
-
-        return null;
     }
 
     function view_objectives($weekstart = 0) {
-        global $CFG, $USER;
+        global $USER, $DB, $OUTPUT;
 
         if (!$this->can_view_objectives()) {
-            redirect($CFG->wwwroot.'/course/view.php/id='.$this->course->id);
+            //UT
+            redirect(new moodle_url('/course/view.php',array('id'=>$this->course->id)));
         }
 
+        //UT
         $weekstart = $this->getweekstart($weekstart);
         $prevweek = $weekstart - (7 * 24 * 60 * 60);
         $nextweek = $weekstart + (7 * 24 * 60 * 60);
 
-        $thisurl = $CFG->wwwroot.'/blocks/objectives/view.php?viewtab=objectives&course='.$this->course->id;
-        $nextlink = $thisurl.'&weekstart='.$nextweek;
-        $prevlink = $thisurl.'&weekstart='.$prevweek;
-        $thisurl .= '&weekstart='.$weekstart;
+        $thisurl = new moodle_url('/blocks/objectives/view.php', array('viewtab'=>'objectives', 'course'=>$this->course->id, 'weekstart'=>$weekstart));
+        $nextlink = new moodle_url($thisurl, array('weekstart'=>$nextweek));
+        $prevlink = new moodle_url($thisurl, array('weekstart'=>$prevweek));
 
         // Load all the objectives for the selected week
         $allgroups = has_capability('moodle/site:accessallgroups', $this->context);
@@ -324,30 +338,32 @@ class block_objectives_class {
         $allgroups->name = get_string('allgroups');
         $groups[0] = $allgroups;
 
-        $timetables = get_records_select('objectives_timetable', "objectivesid = {$this->settings->id} AND groupid IN (".implode(',',array_keys($groups)).')', 'day, starttime, groupid');
-        $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = '.$weekstart);
+        list($gsql, $gparam) = $DB->get_in_or_equal(array_keys($groups));
+        $params = array_merge(array($this->settings->id),$gparam);
+        $timetables = $DB->get_records_select('objectives_timetable', 'objectivesid = ? AND groupid '.$gsql, $params, 'day, starttime, groupid');
 
-        if ($objectives) {
-            foreach ($objectives as $obj) {
-                $timetables[$obj->timetableid]->objectives = $obj->objectives;
-            }
+        list($tsql, $tparam) = $DB->get_in_or_equal(array_keys($timetables));
+        $params = array_merge(array($weekstart),$tparam);
+        $objectives = $DB->get_records_select('objectives_objectives', 'weekstart = ? AND timetableid '.$tsql, $params);
+
+        foreach ($objectives as $obj) {
+            $timetables[$obj->timetableid]->objectives = $obj->objectives;
         }
 
         $num2day = array('monday','tuesday','wednesday','thursday','friday','saturday','sunday');
-        $icons = array('+'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/tick_box.gif" alt="'.get_string('complete','block_objectives').'" />',
-                       '-'=>'<img src="'.$CFG->wwwroot.'/blocks/objectives/pix/empty_box.gif" alt="'.get_string('incomplete','block_objectives').'" />');
-
+        $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objecitves').'" alt="'.get_string('complete','block_objectives').'" />',
+                       '-'=>'<img src="'.$OUTPUT->pix_url('empty_box.gif','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
         $this->print_header();
-        print_heading(get_string('viewobjectives','block_objectives'));
+        echo $OUTPUT->heading(get_string('viewobjectives','block_objectives'));
 
         // Output the week navigation options
-        print_simple_box_start();
+        echo $OUTPUT->box_start();
         echo '<a href="'.$prevlink.'">&lt;&lt;&lt; '.get_string('prevweek','block_objectives').'</a> ';
         echo get_string('weekbegining','block_objectives').' <strong>'.userdate($weekstart, get_string('strftimedaydate')).'</strong>';
         echo ' <a href="'.$nextlink.'">'.get_string('nextweek','block_objectives').' &gt;&gt;&gt;</a>';
-        print_simple_box_end();
+        echo $OUTPUT->box_end();
 
-        print_simple_box_start();
+        echo $OUTPUT->box_start();
         echo '<table class="lesson_objectives_table">';
         $lastday = -1;
         $oddrow = true;
@@ -400,7 +416,7 @@ class block_objectives_class {
             $oddrow = !$oddrow;
         }
         echo '</table>';
-        print_simple_box_end();
+        echo $OUTPUT->box_end();
         
         $this->print_footer();
     }
@@ -414,50 +430,55 @@ class block_objectives_class {
     }
 
     function edit_objectives($weekstart = 0) {
-        global $CFG;
-        
+        global $DB, $OUTPUT;
+        //UT
         $caneditobjectives = $this->can_edit_objectives();
         $canedittimetables = $this->can_edit_timetables();
-        $courseurl = $CFG->wwwroot.'/course/view.php?id='.$this->course->id;
+        $courseurl = new moodle_url('/course/view.php',array('id'=>$this->course->id));
 
         if (!$canedittimetables && !$caneditobjectives) {
+            //UT
             error('You do not have permission to change any lesson objective settings');
         }
 
         if (!$caneditobjectives) {
+            //UT
             $this->edit_timetables();
             return;
         }
 
         // TODO limit to only show objectives for selected group
-        $timetables = get_records('objectives_timetable', 'objectivesid', $this->settings->id, 'day, starttime, groupid');
-        if (!$timetables) {
+        $timetables = $DB->get_records('objectives_timetable', array('objectivesid'=>$this->settings->id), 'day, starttime, groupid');
+        if (empty($timetables)) {
             if ($canedittimetables) {
                 $this->edit_timetables();
                 return;
             } else {
                 //UT
                 $this->print_header();
-                print_simple_box(get_string('notimetables','block_objectives'));
-                print_continue($courseurl);
+                echo $OUTPUT->box(get_string('notimetables','block_objectives'));
+                echo $OUTPUT->continue($courseurl);
                 $this->print_footer();
                 return;
             }
         }
 
+        //UT
         $weekstart = $this->getweekstart($weekstart);
         $prevweek = $weekstart - (7 * 24 * 60 * 60);
         $nextweek = $weekstart + (7 * 24 * 60 * 60);
 
-        $thisurl = $CFG->wwwroot.'/blocks/objectives/edit.php?viewtab=objectives&course='.$this->course->id;
-        $nextlink = $thisurl.'&weekstart='.$nextweek;
-        $prevlink = $thisurl.'&weekstart='.$prevweek;
-        $thisurl .= '&weekstart='.$weekstart;
-        
+        $thisurl = new moodle_url('/blocks/objectives/view.php', array('viewtab'=>'objectives', 'course'=>$this->course->id, 'weekstart'=>$weekstart));
+        $nextlink = new moodle_url($thisurl, array('weekstart'=>$nextweek));
+        $prevlink = new moodle_url($thisurl, array('weekstart'=>$prevweek));
+
         $mform = new block_objectives_objectives_form($thisurl, array('timetables'=>$timetables, 'course'=>$this->course));
         
         // Load all the objectives for the selected week
-        $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = '.$weekstart);
+        list($tsql, $tparam) = $DB->get_in_or_equal(array_keys($timetables));
+        $params = array_merge(array($weekstart),$tparam);
+        $objectives = $DB->get_records_select('objectives_objectives', 'weekstart = ? AND timetableid '.$tsql, $params);
+
         $formdata = array();
         $formdata['weekstart'] = $weekstart;
         if ($objectives) {
@@ -470,6 +491,7 @@ class block_objectives_class {
         $mform->set_data($formdata);
 
         if ($mform->is_cancelled()) {
+            //UT
             redirect($courseurl);
         }
 
@@ -481,43 +503,47 @@ class block_objectives_class {
                         if ($dbobj->timetableid == $timetableid) {
                             $addnew = false;
                             if (trim($obj) == '') {
-                                delete_records('objectives_objectives','id',$dbobj->id);
+                                //UT
+                                $DB->delete_records('objectives_objectives',array('id'=>$dbobj->id));
                             } elseif ($this->remove_checkedoff($dbobj->objectives) != $obj) {
+                                //UT
                                 $upd = new stdClass;
                                 $upd->id = $dbobj->id;
                                 $upd->objectives = $this->add_not_checkedoff($obj);
-                                update_record('objectives_objectives',$upd);
+                                $DB->update_record('objectives_objectives',$upd);
                             }
                         }
                     }
                 }
                 if ($addnew && trim($obj) != '') {
+                    //UT
                     $new = new stdClass;
                     $new->timetableid = $timetableid;
                     $new->weekstart = $weekstart;
                     $new->objectives = $this->add_not_checkedoff($obj);
-                    $new->id = insert_record('objectives_objectives',$new);
+                    $new->id = $DB->insert_record('objectives_objectives',$new);
                 }
             }
             
             if (isset($data->saveandcourse)) {
+                //UT
                 redirect($courseurl);
             }
         }
         
         $this->print_header();
-        print_heading(get_string('editobjectives','block_objectives'));
-        print_simple_box_start();
+        echo $OUTPUT->heading(get_string('editobjectives','block_objectives'));
+        echo $OUTPUT->box_start();
         if ($canedittimetables) {
-            $timetablesurl = $CFG->wwwroot.'/blocks/objectives/edit.php';
-            print_single_button($timetablesurl, array('viewtab'=>'timetables', 'course'=>$this->course->id), get_string('edittimetables','block_objectives'));
+            $timetablesurl = new moodle_url('/blocks/objectives/edit.php',array('viewtab'=>'timetables', 'course'=>$this->course->id));
+            echo $OUTPUT->single_button($timetablesurl, get_string('edittimetables','block_objectives'));
         }
 
         // Output the week navigation options
         echo '<a href="'.$prevlink.'">&lt;&lt;&lt; '.get_string('prevweek','block_objectives').'</a> ';
         echo get_string('weekbegining','block_objectives').' <strong>'.userdate($weekstart, get_string('strftimedaydate')).'</strong>';
         echo ' <a href="'.$nextlink.'">'.get_string('nextweek','block_objectives').' &gt;&gt;&gt;</a>';
-        print_simple_box_end();
+        echo $OUTPUT->box_end();
 
         print_string('editobjectivesinst','block_objectives');
         
@@ -527,22 +553,23 @@ class block_objectives_class {
     }
 
     function edit_timetables() {
-        global $CFG;
+        global $DB, $OUTPUT, $PAGE;
 
         $caneditobjectives = $this->can_edit_objectives();
         $canedittimetables = $this->can_edit_timetables();
-        $courseurl = $CFG->wwwroot.'/course/view.php?id='.$this->course->id;
+        $courseurl = new moodle_url('/course/view.php', array('id'=>$this->course->id));
 
         if (!$canedittimetables) {
             if ($caneditobjectives) {
                 $this->edit_objectives();
                 return;
             } else {
+                //UT
                 error('You do not have permission to change any lesson objective settings');
             }
         }
 
-        $timetables = get_records('objectives_timetable', 'objectivesid', $this->settings->id, 'day, starttime, groupid');
+        $timetables = $DB->get_records('objectives_timetable', array('objectivesid'=>$this->settings->id), 'day, starttime, groupid');
         $days = array('monday'=>array(), 'tuesday'=>array(), 'wednesday'=>array(),
                          'thursday'=>array(), 'friday'=>array(), 'saturday'=>array(),
                          'sunday'=>array());
@@ -572,16 +599,18 @@ class block_objectives_class {
             }
         }
         
-        $thisurl = $CFG->wwwroot.'/blocks/objectives/edit.php?viewtab=timetables&course='.$this->course->id;
-        $objurl = str_replace('viewtab=timetables','viewtab=objectives', $thisurl);
+        $thisurl = new moodle_url('/blocks/objectives/edit.php',array('viewtab'=>'timetables', 'course'=>$this->course->id));
+        $objurl = new moodle_url($thisurl, array('viewtab'=>'objectives');
         $mform = new block_objectives_timetable_form($thisurl, array('course' => $this->course, 'days' => $days));
 
         $mform->set_data($settings);
 
         if ($mform->is_cancelled()) {
+            //UT
             if ($timetables) {
                 redirect($objurl);
             } else {
+                //UT
                 // Going back to objectives edit screen, with no timetables, would loop back here
                 redirect($courseurl);
             }
@@ -591,18 +620,21 @@ class block_objectives_class {
             foreach ($data->lgroup as $lid=>$lgroup) {
                 if ($lid < 0 || !isset($timetables[$lid])) { // New entry
                     if ($lgroup >= 0) { // Not disabled
+                        //UT
                         $new = new stdClass;
                         $new->objectivesid = $this->settings->id;
                         $new->groupid = $lgroup;
                         $new->day = $data->lday[$lid];
                         $new->starttime = ($data->lstarthour[$lid] * 60 * 60) + ($data->lstartminute[$lid] * 60);
                         $new->endtime = ($data->lendhour[$lid] * 60 * 60) + ($data->lendminute[$lid] * 60);
-                        $new->id = insert_record('objectives_timetable', $new);
+                        $new->id = $DB->insert_record('objectives_timetable', $new);
                     }
                 } else { // Existing entry
                     if ($lgroup < 0) { // Entry disabled
-                        delete_records('objectives_timetable','id',$lid,'objectivesid',$this->settings->id); // Added 'objectivesid' check, just to be on the safe side
+                        //UT
+                        $DB->delete_records('objectives_timetable',array('id'=>$lid,'objectivesid'=>$this->settings->id)); // Added 'objectivesid' check, just to be on the safe side
                     } else { // Update entry (if changed)
+                        //UT
                         $upd = new stdClass;
                         $upd->id = $lid;
                         $upd->objectivesid = $this->settings->id;
@@ -615,7 +647,8 @@ class block_objectives_class {
                             $upd->starttime != $timetables[$lid]->starttime ||
                             $upd->endtime != $timetables[$lid]->endtime) {  // Something has changed
                             if ($upd->day == $timetables[$lid]->day && $upd->objectivesid == $timetables[$lid]->objectivesid) {
-                                update_record('objectives_timetable',$upd);
+                                //UT
+                                $DB->update_record('objectives_timetable',$upd);
                             } else {
                                 $this->print_header();
                                 error('Attempting to update record that does not match database');
@@ -626,28 +659,34 @@ class block_objectives_class {
             }
             
             if (isset($data->saveandobjectives)) {
+                //UT
                 redirect($objurl);
             } else {
+                //UT
                 redirect($thisurl);
             }
         }
 
         $this->print_header();
-        print_heading(get_string('edittimetables','block_objectives'));
-        print_simple_box(get_string('edittimetablesinst','block_objectives'));
+        echo $OUTPUT->heading(get_string('edittimetables','block_objectives'));
+        echo $OUTPUT->box(get_string('edittimetablesinst','block_objectives'));
         $mform->display();
         $this->print_footer();
     }
 
     function print_header() {
-        $navlinks = array(array('name' => get_string('pluginname','block_objectives')));
-        $navigation = build_navigation($navlinks);
+        global $PAGE, $OUTPUT;
 
-        print_header_simple(get_string('pluginname', 'block_objectives'), '', $navigation, '', '', true, '', false);
+        $pagetitle = strip_tags($this->course->shortname.': '.get_string('pluginname','block_objectives'));
+
+        $PAGE->set_title($pagetitle);
+        $PAGE->set_heading($this->course->fullname);
+
+        echo $OUTPUT->header();
     }
 
     function print_footer() {
-        print_footer($this->course);
+        echo $OUTPUT->footer();
     }
 }
 
