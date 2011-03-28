@@ -19,7 +19,8 @@ class block_objectives extends block_base {
         if ($this->content !== NULL) {
             return $this->content;
         }
-
+        
+        //UT
         $obj = new block_objectives_class($COURSE);
 
         $this->content = new stdClass;
@@ -34,8 +35,9 @@ class block_objectives extends block_base {
     }
 
     function instance_config_print() {
-        global $CFG, $COURSE;
-        
+        global $COURSE;
+
+        //UT
         $obj = new block_objectives_class($COURSE);
         $settings = $obj->get_settings();
 
@@ -69,6 +71,7 @@ class block_objectives extends block_base {
     }
 
     function instance_config_save($data) {
+        //UT
         $this->instance_config_print();
         return true;
     }

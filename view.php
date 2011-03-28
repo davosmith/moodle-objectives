@@ -6,8 +6,9 @@ require_once(dirname(__FILE__).'/lib.php');
 $courseid = required_param('course',PARAM_INT);
 $weekstart = optional_param('weekstart', 0, PARAM_INT);
 
-$course = get_record('course', 'id', $courseid);
+$course = $DB->get_record('course', array('id'=>$courseid));
 if (!$course) {
+    //UT
     error('Invalid courseid');
 }
 
