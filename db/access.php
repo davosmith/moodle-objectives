@@ -1,6 +1,6 @@
 <?php
 
-$block_objectives_capabilities = array(
+$capabilities = array(
     // Can edit timetables
     'block/objectives:edittimetables' => array(
          'captype' => 'write',
@@ -9,7 +9,7 @@ $block_objectives_capabilities = array(
          'legacy' => array(
               'editingteacher' => CAP_ALLOW,
               'coursecreator' => CAP_ALLOW,
-              'admin' => CAP_ALLOW
+              'manager' => CAP_ALLOW
          )
     ),
 
@@ -21,7 +21,7 @@ $block_objectives_capabilities = array(
          'legacy' => array(
               'editingteacher' => CAP_ALLOW,
               'coursecreator' => CAP_ALLOW,
-              'admin' => CAP_ALLOW
+              'manager' => CAP_ALLOW
          )
     ),
 
@@ -33,7 +33,7 @@ $block_objectives_capabilities = array(
               'teacher' => CAP_ALLOW,
               'editingteacher' => CAP_ALLOW,
               'coursecreator' => CAP_ALLOW,
-              'admin' => CAP_ALLOW
+              'manager' => CAP_ALLOW
          )
     ),
     
@@ -46,7 +46,7 @@ $block_objectives_capabilities = array(
               'teacher' => CAP_ALLOW,             
               'editingteacher' => CAP_ALLOW,
               'coursecreator' => CAP_ALLOW,
-              'admin' => CAP_ALLOW
+              'manager' => CAP_ALLOW
          )
     )
 );
