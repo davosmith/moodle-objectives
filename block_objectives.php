@@ -14,7 +14,7 @@ class block_objectives extends block_base {
     }
 
     function get_content() {
-        global $CFG, $COURSE;
+        global $COURSE;
         
         if ($this->content !== NULL) {
             return $this->content;
@@ -39,7 +39,7 @@ class block_objectives extends block_base {
         $obj = new block_objectives_class($COURSE);
         $settings = $obj->get_settings();
 
-        $returl = $CFG->wwwroot.'/course/view.php?id='.$settings->course;
+        $returl = new moodle_url('/course/view.php', array('id'=>$settings->course));
         $mform = new block_objectives_edit_form(qualified_me());
 
         $settings->objectivesid = $settings->id;
