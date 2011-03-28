@@ -14,7 +14,7 @@ if (!$course) {
 
 $url = new moodle_url('/blocks/objectives/view.php',array('course'=>$course->id));
 if ($weekstart != 0) {
-    $url->add_param('weekstart',$weekstart);
+    $url->param('weekstart',$weekstart);
 }
 $PAGE->set_url($url);
 

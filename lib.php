@@ -29,7 +29,7 @@ class block_objectives_class {
             $this->settings = new stdClass;
             $this->settings->course = $course->id;
             $this->settings->intro = get_string('defaultintro','block_objectives');
-            $this->settings->id = $B->insert_record('objectives',$this->settings);
+            $this->settings->id = $DB->insert_record('objectives',$this->settings);
         }
 
         $this->context = get_context_instance(CONTEXT_COURSE, $course->id);
@@ -342,9 +342,13 @@ class block_objectives_class {
         $params = array_merge(array($this->settings->id),$gparam);
         $timetables = $DB->get_records_select('objectives_timetable', 'objectivesid = ? AND groupid '.$gsql, $params, 'day, starttime, groupid');
 
-        list($tsql, $tparam) = $DB->get_in_or_equal(array_keys($timetables));
-        $params = array_merge(array($weekstart),$tparam);
-        $objectives = $DB->get_records_select('objectives_objectives', 'weekstart = ? AND timetableid '.$tsql, $params);
+        if (empty($timetables)) {
+            $objectives = array();
+        } else {
+            list($tsql, $tparam) = $DB->get_in_or_equal(array_keys($timetables));
+            $params = array_merge(array($weekstart),$tparam);
+            $objectives = $DB->get_records_select('objectives_objectives', 'weekstart = ? AND timetableid '.$tsql, $params);
+        }
 
         foreach ($objectives as $obj) {
             $timetables[$obj->timetableid]->objectives = $obj->objectives;
@@ -600,7 +604,7 @@ class block_objectives_class {
         }
         
         $thisurl = new moodle_url('/blocks/objectives/edit.php',array('viewtab'=>'timetables', 'course'=>$this->course->id));
-        $objurl = new moodle_url($thisurl, array('viewtab'=>'objectives');
+        $objurl = new moodle_url($thisurl, array('viewtab'=>'objectives'));
         $mform = new block_objectives_timetable_form($thisurl, array('course' => $this->course, 'days' => $days));
 
         $mform->set_data($settings);
@@ -686,6 +690,7 @@ class block_objectives_class {
     }
 
     function print_footer() {
+        global $OUTPUT;
         echo $OUTPUT->footer();
     }
 }
