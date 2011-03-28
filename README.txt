@@ -1,7 +1,8 @@
 Lesson objectives block
 =======================
 
-This is a block for Moodle 1.9. I am hoping to get it working with Moodle 2.0 in the next few days, but the current version will not work at all on a Moodle 2.0 site.
+This is a block for Moodle 1.9 and Moodle 2.0.
+This is the Moodle 2.0 version ( download the Moodle 2.0 version here - https://github.com/davosmith/moodle-objectives/zipball/MOODLE_19_STABLE )
 
 It displays current lesson objectives in the side bar (to both teacher and students) and allows a teacher to check them off as they are completed. You can enter a timetable, linked to different groups, so that objectives can be entered as far in advance as you want and will be displayed at the appropriate time.
 
@@ -35,4 +36,3 @@ During a lesson, a teacher can click on an objective to toggle the 'tick' box be
 ==Contact==
 
 Any questions or suggestions for improvement, please drop an email to "davo AT davodev DOT co DOT uk" or visit http://www.davodev.co.uk
-
