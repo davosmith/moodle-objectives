@@ -142,7 +142,7 @@ class block_objectives_class {
     }
 
     function get_block_text() {
-        global $USER, $DB, $OUTPUT;
+        global $USER, $DB, $OUTPUT, $PAGE;
 
         if (!$this->can_view_objectives()) {
             return null;
@@ -185,9 +185,6 @@ class block_objectives_class {
         if (!$objectives) {
             $text .= '<br/>'.get_string('noobjectives','block_objectives');
         } else {
-            //FIXME - get JS working
-            //require_js(array('yui_yahoo','yui_dom-event','yui_container','yui_animation',$CFG->wwwroot.'/blocks/objectives/objectives.js'));
-
             $groupsmenu = '';
             if (count($objectives) > 1) {
                 // More than one eligible lesson with objectives - select the best one and display a menu to choose further
@@ -281,8 +278,12 @@ class block_objectives_class {
             
             $startfull = optional_param('lesson_objectives_fullscreen',0,PARAM_INT);
             $fsicon = $OUTPUT->pix_url('fullscreen_maximize','block_objectives');
-            //FIXME - get JS working
-            //$text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'","'.$startfull.'");</script>';
+            
+            $jsmodule = array('name' => 'block_objectives',
+                              'fullpath' => new moodle_url('/blocks/objectives/objectives.js'),
+                              'requires' => array('yui2-yahoo','yui2-dom','yui2-container','yui2-animation'));
+            $params = array($fsicon->out(), get_string('fullscreen','block_objectives'), $startfull);
+            $PAGE->requires->js_init_call('M.block_objectives.init_fullscreen', $params, true, $jsmodule);
         }
 
         return $text;
