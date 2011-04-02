@@ -300,8 +300,8 @@ class block_objectives_class {
         }
 
         $weekstart = $this->getweekstart($weekstart);
-        $prevweek = $weekstart - (7 * 24 * 60 * 60);
-        $nextweek = $weekstart + (7 * 24 * 60 * 60);
+        $prevweek = $weekstart - (6 * 24 * 60 * 60); // Put it inside the previous week, to avoid summer time / timezone errors
+        $nextweek = $weekstart + (8 * 24 * 60 * 60);
 
         $thisurl = $CFG->wwwroot.'/blocks/objectives/view.php?viewtab=objectives&course='.$this->course->id;
         $nextlink = $thisurl.'&weekstart='.$nextweek;
@@ -446,8 +446,8 @@ class block_objectives_class {
         }
 
         $weekstart = $this->getweekstart($weekstart);
-        $prevweek = $weekstart - (7 * 24 * 60 * 60);
-        $nextweek = $weekstart + (7 * 24 * 60 * 60);
+        $prevweek = $weekstart - (6 * 24 * 60 * 60); // Put it within last week, to avoid timezone / summer time errors
+        $nextweek = $weekstart + (8 * 24 * 60 * 60);
 
         $thisurl = $CFG->wwwroot.'/blocks/objectives/edit.php?viewtab=objectives&course='.$this->course->id;
         $nextlink = $thisurl.'&weekstart='.$nextweek;
