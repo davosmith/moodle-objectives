@@ -13,10 +13,8 @@ class block_objectives_class {
         global $DB;
 
         if (is_int($course)) {
-            //UT
             $course = $DB->get_record('course',array('id'=>$course));
             if (!$course) {
-                //UT
                 error('Invalid course id');
             }
         }
@@ -25,7 +23,6 @@ class block_objectives_class {
         
         $this->settings = $DB->get_record('objectives',array('course'=>$course->id));
         if (!$this->settings) {
-            //UT
             $this->settings = new stdClass;
             $this->settings->course = $course->id;
             $this->settings->intro = get_string('defaultintro','block_objectives');
@@ -141,7 +138,6 @@ class block_objectives_class {
 
         $baseurl = new moodle_url('/course/view.php',array('id'=>$this->course->id));
 
-        //UT
         return get_string('view').': <span class="lesson_objectives_groupsmenu">'.$OUTPUT->single_select($baseurl, 'objecitves_group', $groupsmenu, $selected->groupid).'</span>';
     }
 
@@ -201,13 +197,11 @@ class block_objectives_class {
                 // Only one eligiblw lesson with objectives - select it
                 $objsel = reset($objectives);
             }
-            //UT
             $objarray = explode("\n", $objsel->objectives);
-            $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objecitves').'" alt="'.get_string('complete','block_objectives').'" />',
+            $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objectives').'" alt="'.get_string('complete','block_objectives').'" />',
                            '-'=>'<img src="'.$OUTPUT->pix_url('empty_box','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
 
             if ($cancheckoff) {
-                //UT
                 $link = array('+'=>'<a href="'.$courseurl->out(true, array('incomplete_objective'=>$objsel->id)).':%d" >',
                               '-'=>'<a href="'.$courseurl->out(true, array('complete_objective'=>$objsel->id)).':%d" >');
             }
@@ -356,7 +350,7 @@ class block_objectives_class {
         }
 
         $num2day = array('monday','tuesday','wednesday','thursday','friday','saturday','sunday');
-        $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objecitves').'" alt="'.get_string('complete','block_objectives').'" />',
+        $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objectives').'" alt="'.get_string('complete','block_objectives').'" />',
                        '-'=>'<img src="'.$OUTPUT->pix_url('empty_box','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
         $this->print_header();
         echo $OUTPUT->heading(get_string('viewobjectives','block_objectives'));
