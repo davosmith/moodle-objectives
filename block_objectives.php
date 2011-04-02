@@ -8,6 +8,10 @@ class block_objectives extends block_base {
         $this->title = get_string('pluginname','block_objectives');
     }
 
+    function applicable_formats() {
+        return array('all'=>false, 'course'=>true);
+    }
+
     function preferred_width() {
         return 240;
     }
