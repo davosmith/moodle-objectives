@@ -126,11 +126,13 @@ class block_objectives_class {
     }
 
     function groups_menu($objectives, $groups) {
+        global $OUTPUT;
+
         if (count($objectives) < 2) {
             return '';
         }
 
-        $selected = $this->selected_group($objectives);
+        $selected = $this->objectives_for_selected_group($objectives);
 
         $groupsmenu = array();
         foreach ($objectives as $obj) {
@@ -144,7 +146,7 @@ class block_objectives_class {
     }
 
     function get_block_text() {
-        global $USER, $DB;
+        global $USER, $DB, $OUTPUT;
 
         if (!$this->can_view_objectives()) {
             return null;
@@ -173,7 +175,6 @@ class block_objectives_class {
         $allgroups->name = get_string('allgroups');
         $groups[0] = $allgroups;
 
-        //UT
         list($gsql, $gparam) = $DB->get_in_or_equal(array_keys($groups));
         $sql = 'SELECT o.id, o.objectives, t.starttime, t.endtime, t.groupid ';
         $sql .= "FROM {objectives_objectives} o, {objectives_timetable} t ";
@@ -203,12 +204,12 @@ class block_objectives_class {
             //UT
             $objarray = explode("\n", $objsel->objectives);
             $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objecitves').'" alt="'.get_string('complete','block_objectives').'" />',
-                           '-'=>'<img src="'.$OUTPUT->pix_url('empty_box.gif','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
+                           '-'=>'<img src="'.$OUTPUT->pix_url('empty_box','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
 
             if ($cancheckoff) {
                 //UT
-                $link = array('+'=>'<a href="'.$courseurl->output(array('incomplete_objective'=>$objsel->id.':%d')).'" >',
-                              '-'=>'<a href="'.$courseurl->output(array('complete_objective'=>$objsel->id.':%d')).'" >');
+                $link = array('+'=>'<a href="'.$courseurl->out(true, array('incomplete_objective'=>$objsel->id)).':%d" >',
+                              '-'=>'<a href="'.$courseurl->out(true, array('complete_objective'=>$objsel->id)).':%d" >');
             }
 
             if ($cancheckoff) {
@@ -263,7 +264,7 @@ class block_objectives_class {
                 $objtext .= '<li>';
                 if ($cancheckoff) { // Add a 'check-off' link
                     //UT
-                    $objtext .= sprintf($link[$complete], $idx);
+                    $objtext .= sprintf($link[$complete],$idx);
                 }
                 $objtext .= $icons[$complete].s(trim($obj));
                 if ($cancheckoff) {
@@ -287,7 +288,7 @@ class block_objectives_class {
             $text .= $groupsmenu;
             
             $startfull = optional_param('lesson_objectives_fullscreen',0,PARAM_INT);
-            $fsicon = $CFG->wwwroot.'/blocks/objectives/pix/fullscreen_maximize.gif';
+            $fsicon = $OUTPUT->pix_url('fullscreen_maximize','block_objectives');
             //FIXME - get JS working
             //$text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'","'.$startfull.'");</script>';
         }
@@ -356,7 +357,7 @@ class block_objectives_class {
 
         $num2day = array('monday','tuesday','wednesday','thursday','friday','saturday','sunday');
         $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objecitves').'" alt="'.get_string('complete','block_objectives').'" />',
-                       '-'=>'<img src="'.$OUTPUT->pix_url('empty_box.gif','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
+                       '-'=>'<img src="'.$OUTPUT->pix_url('empty_box','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
         $this->print_header();
         echo $OUTPUT->heading(get_string('viewobjectives','block_objectives'));
 
@@ -472,7 +473,7 @@ class block_objectives_class {
         $prevweek = $weekstart - (7 * 24 * 60 * 60);
         $nextweek = $weekstart + (7 * 24 * 60 * 60);
 
-        $thisurl = new moodle_url('/blocks/objectives/view.php', array('viewtab'=>'objectives', 'course'=>$this->course->id, 'weekstart'=>$weekstart));
+        $thisurl = new moodle_url('/blocks/objectives/edit.php', array('viewtab'=>'objectives', 'course'=>$this->course->id, 'weekstart'=>$weekstart));
         $nextlink = new moodle_url($thisurl, array('weekstart'=>$nextweek));
         $prevlink = new moodle_url($thisurl, array('weekstart'=>$prevweek));
 
