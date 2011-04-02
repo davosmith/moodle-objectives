@@ -257,7 +257,6 @@ class block_objectives_class {
                 }
                 $objtext .= '<li>';
                 if ($cancheckoff) { // Add a 'check-off' link
-                    //UT
                     $objtext .= sprintf($link[$complete],$idx);
                 }
                 $objtext .= $icons[$complete].s(trim($obj));
@@ -273,7 +272,6 @@ class block_objectives_class {
             $objtext .= '</ul>';
             $text .= $objtext;
             
-            //UT
             $fshtml = '<div id="lesson_objectives_fullscreen_text" style="display:none;"><div class="lesson_objectives_fullscreen_area">';
             $fshtml .= preg_replace('/(href="[^"]*)"/i','$1&amp;lesson_objectives_fullscreen=1"', $objtext);
             $fshtml .= '</div></div>';
@@ -304,11 +302,9 @@ class block_objectives_class {
         global $USER, $DB, $OUTPUT;
 
         if (!$this->can_view_objectives()) {
-            //UT
             redirect(new moodle_url('/course/view.php',array('id'=>$this->course->id)));
         }
 
-        //UT
         $weekstart = $this->getweekstart($weekstart);
         $prevweek = $weekstart - (7 * 24 * 60 * 60);
         $nextweek = $weekstart + (7 * 24 * 60 * 60);
@@ -430,18 +426,15 @@ class block_objectives_class {
 
     function edit_objectives($weekstart = 0) {
         global $DB, $OUTPUT;
-        //UT
         $caneditobjectives = $this->can_edit_objectives();
         $canedittimetables = $this->can_edit_timetables();
         $courseurl = new moodle_url('/course/view.php',array('id'=>$this->course->id));
 
         if (!$canedittimetables && !$caneditobjectives) {
-            //UT
             error('You do not have permission to change any lesson objective settings');
         }
 
         if (!$caneditobjectives) {
-            //UT
             $this->edit_timetables();
             return;
         }
@@ -453,7 +446,6 @@ class block_objectives_class {
                 $this->edit_timetables();
                 return;
             } else {
-                //UT
                 $this->print_header();
                 echo $OUTPUT->box(get_string('notimetables','block_objectives'));
                 echo $OUTPUT->continue($courseurl);
@@ -462,7 +454,6 @@ class block_objectives_class {
             }
         }
 
-        //UT
         $weekstart = $this->getweekstart($weekstart);
         $prevweek = $weekstart - (7 * 24 * 60 * 60);
         $nextweek = $weekstart + (7 * 24 * 60 * 60);
@@ -490,7 +481,6 @@ class block_objectives_class {
         $mform->set_data($formdata);
 
         if ($mform->is_cancelled()) {
-            //UT
             redirect($courseurl);
         }
 
@@ -502,10 +492,8 @@ class block_objectives_class {
                         if ($dbobj->timetableid == $timetableid) {
                             $addnew = false;
                             if (trim($obj) == '') {
-                                //UT
                                 $DB->delete_records('objectives_objectives',array('id'=>$dbobj->id));
                             } elseif ($this->remove_checkedoff($dbobj->objectives) != $obj) {
-                                //UT
                                 $upd = new stdClass;
                                 $upd->id = $dbobj->id;
                                 $upd->objectives = $this->add_not_checkedoff($obj);
@@ -515,7 +503,6 @@ class block_objectives_class {
                     }
                 }
                 if ($addnew && trim($obj) != '') {
-                    //UT
                     $new = new stdClass;
                     $new->timetableid = $timetableid;
                     $new->weekstart = $weekstart;
@@ -525,7 +512,6 @@ class block_objectives_class {
             }
             
             if (isset($data->saveandcourse)) {
-                //UT
                 redirect($courseurl);
             }
         }
@@ -563,7 +549,6 @@ class block_objectives_class {
                 $this->edit_objectives();
                 return;
             } else {
-                //UT
                 error('You do not have permission to change any lesson objective settings');
             }
         }
@@ -605,11 +590,9 @@ class block_objectives_class {
         $mform->set_data($settings);
 
         if ($mform->is_cancelled()) {
-            //UT
             if ($timetables) {
                 redirect($objurl);
             } else {
-                //UT
                 // Going back to objectives edit screen, with no timetables, would loop back here
                 redirect($courseurl);
             }
@@ -619,7 +602,6 @@ class block_objectives_class {
             foreach ($data->lgroup as $lid=>$lgroup) {
                 if ($lid < 0 || !isset($timetables[$lid])) { // New entry
                     if ($lgroup >= 0) { // Not disabled
-                        //UT
                         $new = new stdClass;
                         $new->objectivesid = $this->settings->id;
                         $new->groupid = $lgroup;
@@ -630,10 +612,8 @@ class block_objectives_class {
                     }
                 } else { // Existing entry
                     if ($lgroup < 0) { // Entry disabled
-                        //UT
                         $DB->delete_records('objectives_timetable',array('id'=>$lid,'objectivesid'=>$this->settings->id)); // Added 'objectivesid' check, just to be on the safe side
                     } else { // Update entry (if changed)
-                        //UT
                         $upd = new stdClass;
                         $upd->id = $lid;
                         $upd->objectivesid = $this->settings->id;
@@ -646,7 +626,6 @@ class block_objectives_class {
                             $upd->starttime != $timetables[$lid]->starttime ||
                             $upd->endtime != $timetables[$lid]->endtime) {  // Something has changed
                             if ($upd->day == $timetables[$lid]->day && $upd->objectivesid == $timetables[$lid]->objectivesid) {
-                                //UT
                                 $DB->update_record('objectives_timetable',$upd);
                             } else {
                                 $this->print_header();
@@ -658,10 +637,8 @@ class block_objectives_class {
             }
             
             if (isset($data->saveandobjectives)) {
-                //UT
                 redirect($objurl);
             } else {
-                //UT
                 redirect($thisurl);
             }
         }
