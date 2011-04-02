@@ -138,7 +138,7 @@ class block_objectives_class {
 
         $baseurl = new moodle_url('/course/view.php',array('id'=>$this->course->id));
 
-        return get_string('view').': <span class="lesson_objectives_groupsmenu">'.$OUTPUT->single_select($baseurl, 'objecitves_group', $groupsmenu, $selected->groupid).'</span>';
+        return get_string('view').': <span class="lesson_objectives_groupsmenu">'.$OUTPUT->single_select($baseurl, 'objectives_group', $groupsmenu, $selected->groupid).'</span>';
     }
 
     function get_block_text() {
