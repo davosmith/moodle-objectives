@@ -1,10 +1,25 @@
 /* -*-CSS-*- */
 
-.lesson_objectives_list, .lesson_objectives_list ul {
+.lesson_objectives_list li, .lesson_objectives_list ul li {
     list-style-type: none;
     padding-left: 0px;
-    margin-left: 1em;
+    /*margin-left: 1em;*/
+    margin-left: 0px;
  }
+
+.lesson_objectives_list ul {
+    margin-bottom: 0px;
+    margin-right: 0px;
+}
+
+.lesson_objectives_list {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.lesson_objectives_groupsmenu div {
+    display: inline-block;
+}
 
 .lesson_objectives_list a:link, .lesson_objectives_list a:visited {
     color: black;
