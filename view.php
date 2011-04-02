@@ -8,8 +8,7 @@ $weekstart = optional_param('weekstart', 0, PARAM_INT);
 
 $course = $DB->get_record('course', array('id'=>$courseid));
 if (!$course) {
-    //UT
-    error('Invalid courseid');
+    print_error('Invalid courseid');
 }
 
 $url = new moodle_url('/blocks/objectives/view.php',array('course'=>$course->id));

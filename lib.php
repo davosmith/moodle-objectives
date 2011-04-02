@@ -306,10 +306,10 @@ class block_objectives_class {
         }
 
         $weekstart = $this->getweekstart($weekstart);
-        $prevweek = $weekstart - (7 * 24 * 60 * 60);
-        $nextweek = $weekstart + (7 * 24 * 60 * 60);
+        $prevweek = $weekstart - (6 * 24 * 60 * 60); // Make sure it is within the previous week (avoid problems with timezones / summer time)
+        $nextweek = $weekstart + (8 * 24 * 60 * 60);
 
-        $thisurl = new moodle_url('/blocks/objectives/view.php', array('viewtab'=>'objectives', 'course'=>$this->course->id, 'weekstart'=>$weekstart));
+        $thisurl = new moodle_url('/blocks/objectives/view.php', array('course'=>$this->course->id, 'weekstart'=>$weekstart));
         $nextlink = new moodle_url($thisurl, array('weekstart'=>$nextweek));
         $prevlink = new moodle_url($thisurl, array('weekstart'=>$prevweek));
 
@@ -455,8 +455,8 @@ class block_objectives_class {
         }
 
         $weekstart = $this->getweekstart($weekstart);
-        $prevweek = $weekstart - (7 * 24 * 60 * 60);
-        $nextweek = $weekstart + (7 * 24 * 60 * 60);
+        $prevweek = $weekstart - (6 * 24 * 60 * 60); // Make sure it is within the previous week (avoid problems with timezones / summer time)
+        $nextweek = $weekstart + (8 * 24 * 60 * 60);
 
         $thisurl = new moodle_url('/blocks/objectives/edit.php', array('viewtab'=>'objectives', 'course'=>$this->course->id, 'weekstart'=>$weekstart));
         $nextlink = new moodle_url($thisurl, array('weekstart'=>$nextweek));
