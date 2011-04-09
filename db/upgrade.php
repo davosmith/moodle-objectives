@@ -49,7 +49,7 @@ function xmldb_block_objectives_upgrade($oldversion=0) {
         $result = $result && rename_field($table, $field, 'weekstart');
 
         // Add index for 'weekstart' field
-        $index = new XMLDBIndex('weekstartstr');
+        $index = new XMLDBIndex('weekstart');
         $index->setAttributes(XMLDB_INDEX_NOTUNIQUE, array('timetableid', 'weekstart'));
         $result = $result && add_index($table, $index);
     }
