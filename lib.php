@@ -52,21 +52,39 @@ class block_objectives_class {
     function can_edit_timetables() { return has_capability('block/objectives:edittimetables', $this->context); }
     function can_checkoff_objectives() { return has_capability('block/objectives:checkoffobjectives', $this->context); }
 
-    // Get timestamp for midnight Monday of the week containting $timestamp (or this week, if $timestamp is 0)
-    function getweekstart($timestamp=0) {
-        if ($timestamp) {
-            $dateinfo = getdate($timestamp);
+    function ws2ts($weekstart) {
+        return mktime(12,0,0,substr($weekstart,4,2),substr($weekstart,6,2),substr($weekstart,0,4));
+    }
+
+    function ts2ws($timestamp) {
+        return date('Ymd', $timestamp);
+    }
+
+    // Get string representing start of week in YYYYMMDD format
+    function getweekstart($weekstart=null) {
+        if ($weekstart and strlen($weekstart) == 8) {
+            $ts = $this->ws2ts($weekstart);
+            $dateinfo = getdate($ts);
+            if ($dateinfo['wday'] == 1) { // Passed in string was for a Monday
+                return $weekstart;
+            }
         } else {
             $dateinfo = getdate();
         }
 
         $wday = ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0
 
-        // Work out midnight today
-        $weekstart = mktime(0,0,0,$dateinfo['mon'],$dateinfo['mday'],$dateinfo['year']);
-        $weekstart -= (24 * 60 * 60) * $wday; // Subtract number of days to get back to Monday
+        // Work out noon today
+        $weekstartts = mktime(12,0,0,$dateinfo['mon'],$dateinfo['mday'],$dateinfo['year']);
+        $weekstartts -= (24 * 60 * 60) * $wday; // Subtract number of days to get back to Monday
+        return $this->ts2ws($weekstartts); // Convert to string YYYYMMDD
+    }
 
-        return $weekstart;
+    function addweek($weekstart, $offset) {
+        // Work out timestamp for noon on specified day
+        $ts = $this->ws2ts($weekstart);
+        $ts += 7 * 24 * 60 * 60 * $offset; // Add on number of weeks requested
+        return $this->ts2ws($ts); // Convert to string YYYYMMDD
     }
 
     function getweekday($timestamp=0) {
@@ -182,7 +200,7 @@ class block_objectives_class {
 
         $sql = 'SELECT o.id, o.objectives, t.starttime, t.endtime, t.groupid ';
         $sql .= "FROM {$CFG->prefix}objectives_objectives o, {$CFG->prefix}objectives_timetable t ";
-        $sql .= 'WHERE o.timetableid = t.id AND o.weekstart = '.$weekstart;
+        $sql .= 'WHERE o.timetableid = t.id AND o.weekstart = "'.$weekstart.'"';
         $sql .= ' AND t.objectivesid = '.$this->settings->id.' AND t.day = '.$day.' AND t.starttime <= '.$timenow.' AND t.endtime > '.$timenow;
         $sql .= ' AND t.groupid IN ('.implode(',',array_keys($groups)).')';
         $objectives = get_records_sql($sql);
@@ -307,7 +325,7 @@ class block_objectives_class {
         return null;
     }
 
-    function view_objectives($weekstart = 0) {
+    function view_objectives($weekstart = null) {
         global $CFG, $USER;
 
         if (!$this->can_view_objectives()) {
@@ -315,8 +333,8 @@ class block_objectives_class {
         }
 
         $weekstart = $this->getweekstart($weekstart);
-        $prevweek = $weekstart - (6 * 24 * 60 * 60); // Put it inside the previous week, to avoid summer time / timezone errors
-        $nextweek = $weekstart + (8 * 24 * 60 * 60);
+        $prevweek = $this->addweek($weekstart, -1);
+        $nextweek = $this->addweek($weekstart, 1);
 
         $thisurl = $CFG->wwwroot.'/blocks/objectives/view.php?viewtab=objectives&course='.$this->course->id;
         $nextlink = $thisurl.'&weekstart='.$nextweek;
@@ -340,7 +358,7 @@ class block_objectives_class {
         $groups[0] = $allgroups;
 
         $timetables = get_records_select('objectives_timetable', "objectivesid = {$this->settings->id} AND groupid IN (".implode(',',array_keys($groups)).')', 'day, starttime, groupid');
-        $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = '.$weekstart);
+        $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = "'.$weekstart.'"');
 
         if ($objectives) {
             foreach ($objectives as $obj) {
@@ -358,7 +376,7 @@ class block_objectives_class {
         // Output the week navigation options
         print_simple_box_start();
         echo '<a href="'.$prevlink.'">&lt;&lt;&lt; '.get_string('prevweek','block_objectives').'</a> ';
-        echo get_string('weekbegining','block_objectives').' <strong>'.userdate($weekstart, get_string('strftimedaydate')).'</strong>';
+        echo get_string('weekbegining','block_objectives').' <strong>'.userdate($this->ws2ts($weekstart), get_string('strftimedaydate')).'</strong>';
         echo ' <a href="'.$nextlink.'">'.get_string('nextweek','block_objectives').' &gt;&gt;&gt;</a>';
         print_simple_box_end();
 
@@ -428,7 +446,7 @@ class block_objectives_class {
         return preg_replace('/^(.)/m','-$1',$obj); // Start each line with '-' (incomplete)
     }
 
-    function edit_objectives($weekstart = 0) {
+    function edit_objectives($weekstart = null) {
         global $CFG;
 
         $caneditobjectives = $this->can_edit_objectives();
@@ -461,8 +479,8 @@ class block_objectives_class {
         }
 
         $weekstart = $this->getweekstart($weekstart);
-        $prevweek = $weekstart - (6 * 24 * 60 * 60); // Put it within last week, to avoid timezone / summer time errors
-        $nextweek = $weekstart + (8 * 24 * 60 * 60);
+        $prevweek = $this->addweek($weekstart, -1);
+        $nextweek = $this->addweek($weekstart, 1);
 
         $thisurl = $CFG->wwwroot.'/blocks/objectives/edit.php?viewtab=objectives&course='.$this->course->id;
         $nextlink = $thisurl.'&weekstart='.$nextweek;
@@ -472,7 +490,7 @@ class block_objectives_class {
         $mform = new block_objectives_objectives_form($thisurl, array('timetables'=>$timetables, 'course'=>$this->course));
 
         // Load all the objectives for the selected week
-        $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = '.$weekstart);
+        $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = "'.$weekstart.'"');
         $formdata = array();
         $formdata['weekstart'] = $weekstart;
         if ($objectives) {
@@ -530,7 +548,7 @@ class block_objectives_class {
 
         // Output the week navigation options
         echo '<a href="'.$prevlink.'">&lt;&lt;&lt; '.get_string('prevweek','block_objectives').'</a> ';
-        echo get_string('weekbegining','block_objectives').' <strong>'.userdate($weekstart, get_string('strftimedaydate')).'</strong>';
+        echo get_string('weekbegining','block_objectives').' <strong>'.userdate($this->ws2ts($weekstart), get_string('strftimedaydate')).'</strong>';
         echo ' <a href="'.$nextlink.'">'.get_string('nextweek','block_objectives').' &gt;&gt;&gt;</a>';
         print_simple_box_end();
 
@@ -765,7 +783,7 @@ class block_objectives_objectives_form extends moodleform {
         $mform->setType('course', PARAM_INT);
 
         $mform->addElement('hidden', 'weekstart', 0);
-        $mform->setType('weekstart', PARAM_INT);
+        $mform->setType('weekstart', PARAM_TEXT);
 
         $mform->addElement('hidden', 'action', 'savesettings');
         $mform->setType('action', PARAM_TEXT);
