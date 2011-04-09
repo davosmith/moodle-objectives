@@ -59,5 +59,22 @@ function xmldb_block_objectives_upgrade($oldversion=0) {
         $dbman->add_index($table, $field);
     }
 
+    if ($result && $oldversion < 2011040901) {
+        // Update all old lesson timestamps, using make_timestamp
+        $lessons = $DB->get_records_select('objectives_timetable','starttime < 86400');
+        foreach ($lessons as $lesson) {
+            $starthour = intval($lesson->starttime / (60*60));
+            $startmin = intval($lesson->starttime / 60) % 60;
+            $endhour = intval($lesson->endtime / (60*60));
+            $endmin = intval($lesson->endtime / 60) % 60;
+
+            $updlesson = new stdClass;
+            $updlesson->id = $lesson->id;
+            $updlesson->starttime = make_timestamp(0, 0, 0, $starthour, $startmin, 0);
+            $updlesson->endtime = make_timestamp(0, 0, 0, $endhour, $endmin, 0);
+            $DB->update_record('objectives_timetable', $updlesson);
+        }
+    }
+
     return $result;
 }
