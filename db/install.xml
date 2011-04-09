@@ -32,7 +32,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="timetableid"/>
         <FIELD NAME="timetableid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The id of the timetable entry that these objectives relate to" PREVIOUS="id" NEXT="weekstart"/>
-        <FIELD NAME="weekstart" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The timestamp for midnight Monday morning of this week" PREVIOUS="timetableid" NEXT="objectives"/>
+        <FIELD NAME="weekstart" TYPE="char" LENGTH="8" NOTNULL="false" SEQUENCE="false" COMMENT="Week start date (stored as YYYYMMDD)" PREVIOUS="timetableid" NEXT="objectives"/>
         <FIELD NAME="objectives" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" COMMENT="List of lesson objectives, on separate lines, prepended with + for complete, - for incomplete" PREVIOUS="weekstart"/>
       </FIELDS>
       <KEYS>
