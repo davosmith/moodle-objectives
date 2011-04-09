@@ -27,11 +27,13 @@ function xmldb_block_objectives_upgrade($oldversion=0) {
 
         // Convert all existing 'weekstart' values into string representation
         $objs = get_records_select('objectives_objectives', 'weekstart > 0');
-        foreach ($objs as $obj) {
-            $newobj = new stdClass;
-            $newobj->id = $obj->id;
-            $newobj->weekstartstr = date('Ymd', $obj->weekstart);
-            update_record('objectives_objectives', $newobj);
+        if ($objs) {
+            foreach ($objs as $obj) {
+                $newobj = new stdClass;
+                $newobj->id = $obj->id;
+                $newobj->weekstartstr = date('Ymd', $obj->weekstart);
+                update_record('objectives_objectives', $newobj);
+            }
         }
 
         // Drop the old 'weekstart' index
@@ -52,6 +54,23 @@ function xmldb_block_objectives_upgrade($oldversion=0) {
         $index = new XMLDBIndex('weekstart');
         $index->setAttributes(XMLDB_INDEX_NOTUNIQUE, array('timetableid', 'weekstart'));
         $result = $result && add_index($table, $index);
+    }
+
+    if ($result && $oldversion < 2011040901) {
+        // Update all old lesson timestamps, using make_timestamp
+        $lessons = get_records_select('objectives_timetable','starttime < 86400');
+        foreach ($lessons as $lesson) {
+            $starthour = intval($lesson->starttime / (60*60));
+            $startmin = intval($lesson->starttime / 60) % 60;
+            $endhour = intval($lesson->endtime / (60*60));
+            $endmin = intval($lesson->endtime / 60) % 60;
+
+            $updlesson = new stdClass;
+            $updlesson->id = $lesson->id;
+            $updlesson->starttime = make_timestamp(0, 0, 0, $starthour, $startmin, 0);
+            $updlesson->endtime = make_timestamp(0, 0, 0, $endhour, $endmin, 0);
+            update_record('objectives_timetable', $updlesson);
+        }
     }
 
     return $result;

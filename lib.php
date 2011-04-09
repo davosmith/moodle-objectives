@@ -106,7 +106,7 @@ class block_objectives_class {
             $dateinfo = getdate();
         }
 
-        $timenow = (($dateinfo['hours']*60) + $dateinfo['minutes']) * 60 + $dateinfo['seconds'];
+        $timenow = make_timestamp(0, 0, 0, $dateinfo['hours'], $dateinfo['minutes'], $dateinfo['seconds']);
         return $timenow;
     }
 
@@ -591,10 +591,10 @@ class block_objectives_class {
                 $days[$num2day[$lesson->day]][] = $lesson->id; // Store the id to use when creating the form
                 // Store the settings for this entry
                 $settings["lgroup[{$lesson->id}]"] = $lesson->groupid;
-                $settings["lstarthour[{$lesson->id}]"] = (int)($lesson->starttime / (60 * 60));
-                $settings["lstartminute[{$lesson->id}]"] = (int)(($lesson->starttime / 60) % 60);
-                $settings["lendhour[{$lesson->id}]"] = (int)($lesson->endtime / (60 * 60));
-                $settings["lendminute[{$lesson->id}]"] = (int)(($lesson->endtime / 60) % 60);
+                $settings["lstarthour[{$lesson->id}]"] = intval(userdate($lesson->starttime, '%H'));
+                $settings["lstartminute[{$lesson->id}]"] = intval(userdate($lesson->starttime, '%M'));
+                $settings["lendhour[{$lesson->id}]"] = intval(userdate($lesson->endtime, '%H'));
+                $settings["lendminute[{$lesson->id}]"] = intval(userdate($lesson->endtime, '%M'));
             }
         }
         $lastnew = 0;
@@ -628,8 +628,8 @@ class block_objectives_class {
                         $new->objectivesid = $this->settings->id;
                         $new->groupid = $lgroup;
                         $new->day = $data->lday[$lid];
-                        $new->starttime = ($data->lstarthour[$lid] * 60 * 60) + ($data->lstartminute[$lid] * 60);
-                        $new->endtime = ($data->lendhour[$lid] * 60 * 60) + ($data->lendminute[$lid] * 60);
+                        $new->starttime = make_timestamp(0, 0, 0, $data->lstarthour[$lid], $data->lstartminute[$lid], 0);
+                        $new->endtime = make_timestamp(0, 0, 0, $data->lendhour[$lid], $data->lendminute[$lid], 0);
                         $new->id = insert_record('objectives_timetable', $new);
                     }
                 } else { // Existing entry
@@ -641,8 +641,8 @@ class block_objectives_class {
                         $upd->objectivesid = $this->settings->id;
                         $upd->groupid = $lgroup;
                         $upd->day = $data->lday[$lid];
-                        $upd->starttime = ($data->lstarthour[$lid] * 60 * 60) + ($data->lstartminute[$lid] * 60);
-                        $upd->endtime = ($data->lendhour[$lid] * 60 * 60) + ($data->lendminute[$lid] * 60);
+                        $upd->starttime = make_timestamp(0, 0, 0, $data->lstarthour[$lid], $data->lstartminute[$lid], 0);
+                        $upd->endtime = make_timestamp(0, 0, 0, $data->lendhour[$lid], $data->lendminute[$lid], 0);
 
                         if ($upd->groupid != $timetables[$lid]->groupid ||
                             $upd->starttime != $timetables[$lid]->starttime ||
