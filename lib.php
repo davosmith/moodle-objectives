@@ -1,10 +1,25 @@
 <?php
 
+// This file is part of the Lesson Objectives plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->libdir.'/formslib.php');
 
 class block_objectives_class {
-    
+
     var $settings;
     var $context;
     var $course;
@@ -18,7 +33,7 @@ class block_objectives_class {
         }
 
         $this->course = $course;
-        
+
         $this->settings = get_record('objectives','course',$course->id);
         if (!$this->settings) {
             $this->settings = new stdClass;
@@ -46,7 +61,7 @@ class block_objectives_class {
         }
 
         $wday = ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0
-        
+
         // Work out midnight today
         $weekstart = mktime(0,0,0,$dateinfo['mon'],$dateinfo['mday'],$dateinfo['year']);
         $weekstart -= (24 * 60 * 60) * $wday; // Subtract number of days to get back to Monday
@@ -133,7 +148,7 @@ class block_objectives_class {
         foreach ($objectives as $obj) {
             $groupsmenu[$obj->groupid] = $groups[$obj->groupid]->name;
         }
-        
+
         return get_string('view').': '.popup_form($CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;objectives_group=', $groupsmenu, 'selectobjgroup', $selected->groupid, '', '', '', true);
     }
 
@@ -151,7 +166,7 @@ class block_objectives_class {
         $timenow = $this->gettimenow();
 
         $allgroups = has_capability('moodle/site:accessallgroups', $this->context);
-        
+
         $userid = $USER->id;
         if ($allgroups) {
             $userid = 0;
@@ -262,14 +277,14 @@ class block_objectives_class {
             }
             $objtext .= '</ul>';
             $text .= $objtext;
-            
+
             $fshtml = '<div id="lesson_objectives_fullscreen_text" style="display:none;"><div class="lesson_objectives_fullscreen_area">';
             $fshtml .= preg_replace('/(href="[^"]*)"/i','$1&lesson_objectives_fullscreen=1"', $objtext);
             $fshtml .= '</div></div>';
 
             $text .= $fshtml;
             $text .= $groupsmenu;
-            
+
             $startfull = optional_param('lesson_objectives_fullscreen',0,PARAM_INT);
             $fsicon = $CFG->wwwroot.'/blocks/objectives/pix/fullscreen_maximize.gif';
             $text .= '<script type="text/javascript">lesson_objectives.init_fullscreen("'.$fsicon.'","'.get_string('fullscreen','block_objectives').'","'.$startfull.'");</script>';
@@ -280,7 +295,7 @@ class block_objectives_class {
 
     function get_block_footer() {
         global $CFG;
-        
+
         $edittext = '';
         if ($this->can_edit_timetables() || $this->can_edit_objectives()) {
             $editlink = $CFG->wwwroot.'/blocks/objectives/edit.php?course='.$this->settings->course;
@@ -310,7 +325,7 @@ class block_objectives_class {
 
         // Load all the objectives for the selected week
         $allgroups = has_capability('moodle/site:accessallgroups', $this->context);
-        
+
         $userid = $USER->id;
         if ($allgroups) {
             $userid = 0;
@@ -391,7 +406,7 @@ class block_objectives_class {
                     }
                 }
                 $objtext .= '</ul>';
-                
+
                 echo $objtext;
             } else {
                 echo '&nbsp;';
@@ -401,7 +416,7 @@ class block_objectives_class {
         }
         echo '</table>';
         print_simple_box_end();
-        
+
         $this->print_footer();
     }
 
@@ -415,7 +430,7 @@ class block_objectives_class {
 
     function edit_objectives($weekstart = 0) {
         global $CFG;
-        
+
         $caneditobjectives = $this->can_edit_objectives();
         $canedittimetables = $this->can_edit_timetables();
         $courseurl = $CFG->wwwroot.'/course/view.php?id='.$this->course->id;
@@ -453,9 +468,9 @@ class block_objectives_class {
         $nextlink = $thisurl.'&weekstart='.$nextweek;
         $prevlink = $thisurl.'&weekstart='.$prevweek;
         $thisurl .= '&weekstart='.$weekstart;
-        
+
         $mform = new block_objectives_objectives_form($thisurl, array('timetables'=>$timetables, 'course'=>$this->course));
-        
+
         // Load all the objectives for the selected week
         $objectives = get_records_select('objectives_objectives', 'timetableid IN ('.implode(',',array_keys($timetables)).') AND weekstart = '.$weekstart);
         $formdata = array();
@@ -466,7 +481,7 @@ class block_objectives_class {
                 $formdata["obj[{$obj->timetableid}]"] = $this->remove_checkedoff($obj->objectives);
             }
         }
-        
+
         $mform->set_data($formdata);
 
         if ($mform->is_cancelled()) {
@@ -499,12 +514,12 @@ class block_objectives_class {
                     $new->id = insert_record('objectives_objectives',$new);
                 }
             }
-            
+
             if (isset($data->saveandcourse)) {
                 redirect($courseurl);
             }
         }
-        
+
         $this->print_header();
         print_heading(get_string('editobjectives','block_objectives'));
         print_simple_box_start();
@@ -520,9 +535,9 @@ class block_objectives_class {
         print_simple_box_end();
 
         print_string('editobjectivesinst','block_objectives');
-        
+
         $mform->display();
-        
+
         $this->print_footer();
     }
 
@@ -550,7 +565,7 @@ class block_objectives_class {
         $settings = array();
         $settings['id'] = $this->settings->id;
         $settings['course'] = $this->course->id;
-        
+
         if ($timetables) {
             $weekday = 0;
             reset($days);
@@ -571,7 +586,7 @@ class block_objectives_class {
                 $days[$key][] = $lastnew; // The blank entries have distinct, negative ids
             }
         }
-        
+
         $thisurl = $CFG->wwwroot.'/blocks/objectives/edit.php?viewtab=timetables&course='.$this->course->id;
         $objurl = str_replace('viewtab=timetables','viewtab=objectives', $thisurl);
         $mform = new block_objectives_timetable_form($thisurl, array('course' => $this->course, 'days' => $days));
@@ -586,7 +601,7 @@ class block_objectives_class {
                 redirect($courseurl);
             }
         }
-        
+
         if (($data = $mform->get_data()) && ($data->action == 'savesettings')) {
             foreach ($data->lgroup as $lid=>$lgroup) {
                 if ($lid < 0 || !isset($timetables[$lid])) { // New entry
@@ -624,7 +639,7 @@ class block_objectives_class {
                     }
                 }
             }
-            
+
             if (isset($data->saveandobjectives)) {
                 redirect($objurl);
             } else {
@@ -706,7 +721,7 @@ class block_objectives_timetable_form extends moodleform {
 
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
-        
+
         $mform->addElement('hidden', 'course', $course->id);
         $mform->setType('course', PARAM_INT);
 
