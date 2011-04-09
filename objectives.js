@@ -37,6 +37,7 @@ YAHOO.util.Event.onDOMReady(function() {
     lesson_objectives.panel = new YAHOO.widget.Panel('lesson_objectives_fullscreen', {
 	width: "800px",
 	fixedcenter: 'contained',
+	x: 50,
 	constraintoviewport: true,
 	underlay: "shadow",
 	close: true,
