@@ -16,17 +16,17 @@ M.block_objectives.init_fullscreen = function(Y, icon, alt, startfull) {
 
     this.panel = new YAHOO.widget.Panel('lesson_objectives_fullscreen', {
 	width: "800px",
-	fixedcenter: true, 
-	constraintoviewport: true, 
-	underlay: "shadow", 
-	close: true, 
+	fixedcenter: 'contained',
+	constraintoviewport: true,
+	underlay: "shadow",
+	close: true,
 	visible: vis,
 	modal: true,
 	zindex: 1000,
 	draggable: false,
 	effect: {effect:YAHOO.widget.ContainerEffect.FADE,duration:0.25}
     });
-    
+
     this.panel.setHeader('Lesson objectives');
     var content = document.getElementById('lesson_objectives_fullscreen_text');
     this.panel.setBody(content.innerHTML);
