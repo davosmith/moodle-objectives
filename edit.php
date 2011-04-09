@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/lib.php');
 
 $courseid = required_param('course',PARAM_INT);
 $viewtab = optional_param('viewtab', 'objectives', PARAM_TEXT);
-$weekstart = optional_param('weekstart', 0, PARAM_INT);
+$weekstart = optional_param('weekstart', null, PARAM_TEXT);
 
 $course = $DB->get_record('course', array('id'=>$courseid));
 if (!$course) {
