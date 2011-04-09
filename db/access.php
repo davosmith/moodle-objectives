@@ -36,14 +36,14 @@ $block_objectives_capabilities = array(
               'admin' => CAP_ALLOW
          )
     ),
-    
+
     // Can view objectives on a course
     'block/objectives:viewobjectives' => array(
          'captype' => 'read',
          'contextlevel' => CONTEXT_COURSE,
          'legacy' => array(
               'student' => CAP_ALLOW,
-              'teacher' => CAP_ALLOW,             
+              'teacher' => CAP_ALLOW,
               'editingteacher' => CAP_ALLOW,
               'coursecreator' => CAP_ALLOW,
               'admin' => CAP_ALLOW

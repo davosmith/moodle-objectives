@@ -16,7 +16,7 @@ class block_objectives extends block_base {
 
     function get_content() {
         global $CFG, $COURSE;
-        
+
         if ($this->content !== NULL) {
             return $this->content;
         }
@@ -36,7 +36,7 @@ class block_objectives extends block_base {
 
     function instance_config_print() {
         global $CFG, $COURSE;
-        
+
         $obj = new block_objectives_class($COURSE);
         $settings = $obj->get_settings();
 
