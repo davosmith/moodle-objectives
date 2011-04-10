@@ -15,7 +15,7 @@ Other features include:
 1. If you haven't done so already, download the zip file from https://github.com/davosmith/moodle-objectives/zipball/master
 2. Extract all the files to a suitable location
 3. Create a folder on your server '<moodle root>/blocks/objectives'
-4. Upload all the files in the 'davosmith-moodle-objectives-XXXXX' folder into this blocks/objectives folder on the server.
+4. Upload all the files in the 'davosmith-moodle-objectives-XXXXX/objectives' folder into this blocks/objectives folder on the server.
 5. Log in as an administrator and click on the 'Notifications' link.
 6. Go into a course, turn on editing and choose 'Lesson objectives' from the 'Add a block' menu
 
