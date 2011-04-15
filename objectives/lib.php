@@ -208,7 +208,9 @@ class block_objectives_class {
         $text = '<strong>'.userdate(time(), get_string('strftimedaydate')).'</strong>';
 
         if (!$objectives) {
-            $text .= '<br/>'.get_string('noobjectives','block_objectives');
+            $text .= '<br/>';
+            $text .= get_string('noobjectives','block_objectives');
+            $text .= ' ('.userdate($timenow, get_string('strftimetime')).')';
         } else {
             require_js(array('yui_yahoo','yui_dom-event','yui_container','yui_animation',$CFG->wwwroot.'/blocks/objectives/objectives.js'));
 
