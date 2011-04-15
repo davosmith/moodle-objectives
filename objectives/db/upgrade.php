@@ -56,7 +56,9 @@ function xmldb_block_objectives_upgrade($oldversion=0) {
 
         // Add index for 'weekstart' field
         $index = new xmldb_index('weekstart', XMLDB_INDEX_NOTUNIQUE, array('timetableid', 'weekstart'));
-        $dbman->add_index($table, $field);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
     }
 
     if ($result && $oldversion < 2011040901) {
