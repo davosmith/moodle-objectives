@@ -218,7 +218,9 @@ class block_objectives_class {
         $text = '<strong>'.userdate(time(), get_string('strftimedaydate')).'</strong>';
 
         if (!$objectives) {
-            $text .= '<br/>'.get_string('noobjectives','block_objectives');
+            $text .= '<br/>';
+            $text .= get_string('noobjectives','block_objectives');
+            $text .= ' ('.userdate($timenow, get_string('strftimetime')).')';
         } else {
             $groupsmenu = '';
             if (count($objectives) > 1) {
