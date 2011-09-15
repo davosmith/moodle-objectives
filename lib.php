@@ -160,7 +160,7 @@ class block_objectives_class {
             return '';
         }
 
-        $selected = $this->selected_group($objectives);
+        $selected = $this->objectives_for_selected_group($objectives);
 
         $groupsmenu = array();
         foreach ($objectives as $obj) {
