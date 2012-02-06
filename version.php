@@ -2,7 +2,7 @@
 
 $plugin->version = 2011061800;
 $plugin->cron = 0;
-$plugin->maturity = MATURITY_STABLE
+$plugin->maturity = MATURITY_STABLE;
 $plugin->release = '2.x (Build: 2012020600)';
 $plugin->component = 'block_objectives';
 $plugin->requires = 2010112400; // Moodle 2.0
