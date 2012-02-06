@@ -25,7 +25,7 @@ class block_objectives_class {
     var $course;
 
     function block_objectives_class($course) {
-        global $DB;
+        global $DB, $CFG;
 
         if (is_int($course)) {
             $course = $DB->get_record('course',array('id'=>$course));
@@ -44,7 +44,11 @@ class block_objectives_class {
             $this->settings->id = $DB->insert_record('objectives',$this->settings);
         }
 
-        $this->context = get_context_instance(CONTEXT_COURSE, $course->id);
+        if ($CFG->version < 2011120100) {
+            $this->context = get_context_instance(CONTEXT_COURSE, $course->id);
+        } else {
+            $this->context = context_course::instance($course->id);
+        }
     }
 
     function get_settings() { return $this->settings; }
