@@ -10,6 +10,10 @@ Other features include:
 * Abiliy to display a large version of the objectives, when teaching from the front of a class room (click on the 'expand' icon)
 * Students can view all the objectives, a week at a time, to help keep track of what they have been doing (and will be doing)
 
+==Recent changes==
+
+2012-02-06 - Minor changes to improve 2.2 compatibility
+
 ==Installation==
 
 1. If you haven't done so already, download the zip file from https://github.com/davosmith/moodle-objectives/zipball/master
