@@ -62,7 +62,7 @@ class restore_objectives_block_structure_step extends restore_structure_step {
 
         $oldid = $data->id;
         $data->course = $courseid;
-        $newid = $DB->insert_record('objectives', $data);
+        $newid = $DB->insert_record('block_objectives', $data);
         $this->set_mapping('objectives', $oldid, $newid);
     }
 
@@ -74,7 +74,7 @@ class restore_objectives_block_structure_step extends restore_structure_step {
 
         $data->objectivesid = $this->get_new_parentid('objectives');
         $data->groupid = $this->get_mappingid('groups', $data->groupid, 0);
-        $newid = $DB->insert_record('objectives_timetable', $data);
+        $newid = $DB->insert_record('block_objectives_timetable', $data);
         $this->set_mapping('objectives_timetable', $oldid, $newid);
     }
 
@@ -85,7 +85,7 @@ class restore_objectives_block_structure_step extends restore_structure_step {
         $oldid = $data->id;
 
         $data->timetableid = $this->get_new_parentid('objectives_timetable');
-        $newid = $DB->insert_record('objectives_objectives', $data);
+        $newid = $DB->insert_record('block_objectives_objectives', $data);
         $this->set_mapping('objectives_objective', $oldid, $newid);
     }
 }

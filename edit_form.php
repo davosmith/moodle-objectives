@@ -50,7 +50,7 @@ class block_objectives_edit_form extends block_edit_form {
                 $upd = new stdClass;
                 $upd->id = $data->objectivesid;
                 $upd->intro = $data->objectivesintro;
-                $DB->update_record('objectives',$upd);
+                $DB->update_record('block_objectives',$upd);
 
                 // Remove these, to prevent them being saved into the block config
                 $mform->removeElement('objectivesintro');

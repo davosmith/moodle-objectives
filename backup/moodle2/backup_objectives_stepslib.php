@@ -52,9 +52,9 @@ class backup_objectives_block_structure_step extends backup_block_structure_step
 
         // Define sources
 
-        $objectives->set_source_table('objectives', array('course' => backup::VAR_COURSEID));
-        $objectives_timetable->set_source_table('objectives_timetable', array('objectivesid' => backup::VAR_PARENTID));
-        $objectives_objective->set_source_table('objectives_objectives', array('timetableid' => backup::VAR_PARENTID));
+        $objectives->set_source_table('block_objectives', array('course' => backup::VAR_COURSEID));
+        $objectives_timetable->set_source_table('block_objectives_timetable', array('objectivesid' => backup::VAR_PARENTID));
+        $objectives_objective->set_source_table('block_objectives_objectives', array('timetableid' => backup::VAR_PARENTID));
 
         // ID annotations
         $objectives_timetable->annotate_ids('groups','groupid');

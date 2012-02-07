@@ -59,6 +59,9 @@ function xmldb_block_objectives_upgrade($oldversion=0) {
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
+
+        // objectives savepoint reached
+        upgrade_block_savepoint(true, 2011040900, 'objectives');
     }
 
     if ($result && $oldversion < 2011040901) {
@@ -76,6 +79,23 @@ function xmldb_block_objectives_upgrade($oldversion=0) {
             $updlesson->endtime = make_timestamp(0, 0, 0, $endhour, $endmin, 0);
             $DB->update_record('objectives_timetable', $updlesson);
         }
+
+        // objectives savepoint reached
+        upgrade_block_savepoint(true, 2011040901, 'objectives');
+    }
+
+    if ($result && $oldversion < 2012020700) {
+        $table = new xmldb_table('objectives');
+        $dbman->rename_table($table, 'block_objectives');
+
+        $table = new xmldb_table('objectives_timetable');
+        $dbman->rename_table($table, 'block_objectives_timetable');
+
+        $table = new xmldb_table('objectives_objectives');
+        $dbman->rename_table($table, 'block_objectives_objectives');
+
+        // objectives savepoint reached
+        upgrade_block_savepoint(true, 2012020700, 'objectives');
     }
 
     return $result;

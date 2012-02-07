@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="objectives" COMMENT="Basic settings for an objectives block" NEXT="objectives_timetable">
+    <TABLE NAME="block_objectives" COMMENT="Basic settings for an objectives block" NEXT="block_objectives_timetable">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The course that this objectives block is on" PREVIOUS="id" NEXT="intro"/>
@@ -15,7 +15,7 @@
         <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="objectives_timetable" COMMENT="Stores the timetable information for the objectives block" PREVIOUS="objectives" NEXT="objectives_objectives">
+    <TABLE NAME="block_objectives_timetable" COMMENT="Stores the timetable information for the objectives block" PREVIOUS="block_objectives" NEXT="block_objectives_objectives">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="objectivesid"/>
         <FIELD NAME="objectivesid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of the objectives block this timetable entry is for" PREVIOUS="id" NEXT="groupid"/>
@@ -28,7 +28,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="objectives_objectives" COMMENT="A list of the lesson objectives for a particular lesson" PREVIOUS="objectives_timetable">
+    <TABLE NAME="block_objectives_objectives" COMMENT="A list of the lesson objectives for a particular lesson" PREVIOUS="block_objectives_timetable">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="timetableid"/>
         <FIELD NAME="timetableid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The id of the timetable entry that these objectives relate to" PREVIOUS="id" NEXT="weekstart"/>

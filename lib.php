@@ -36,12 +36,12 @@ class block_objectives_class {
 
         $this->course = $course;
 
-        $this->settings = $DB->get_record('objectives',array('course'=>$course->id));
+        $this->settings = $DB->get_record('block_objectives', array('course' => $course->id));
         if (!$this->settings) {
             $this->settings = new stdClass;
             $this->settings->course = $course->id;
             $this->settings->intro = get_string('defaultintro','block_objectives');
-            $this->settings->id = $DB->insert_record('objectives',$this->settings);
+            $this->settings->id = $DB->insert_record('block_objectives', $this->settings);
         }
 
         if ($CFG->version < 2011120100) {
@@ -212,7 +212,7 @@ class block_objectives_class {
 
         list($gsql, $gparam) = $DB->get_in_or_equal(array_keys($groups));
         $sql = 'SELECT o.id, o.objectives, t.starttime, t.endtime, t.groupid ';
-        $sql .= "FROM {objectives_objectives} o, {objectives_timetable} t ";
+        $sql .= "FROM {block_objectives_objectives} o, {block_objectives_timetable} t ";
         $sql .= 'WHERE o.timetableid = t.id AND o.weekstart = ?';
         $sql .= ' AND t.objectivesid = ? AND t.day = ? AND t.starttime <= ? AND t.endtime > ?';
         $sql .= ' AND t.groupid '.$gsql;
@@ -255,7 +255,7 @@ class block_objectives_class {
                             $upd = new stdClass;
                             $upd->id = $objsel->id;
                             $upd->objectives = implode("\n",$objarray);
-                            $DB->update_record('objectives_objectives',$upd);
+                            $DB->update_record('block_objectives_objectives',$upd);
                         }
                     }
                 } elseif ($completeobj) {
@@ -266,7 +266,7 @@ class block_objectives_class {
                             $upd = new stdClass;
                             $upd->id = $objsel->id;
                             $upd->objectives = implode("\n",$objarray);
-                            $DB->update_record('objectives_objectives',$upd);
+                            $DB->update_record('block_objectives_objectives',$upd);
                         }
                     }
                 }
@@ -374,7 +374,7 @@ class block_objectives_class {
 
         list($gsql, $gparam) = $DB->get_in_or_equal(array_keys($groups));
         $params = array_merge(array($this->settings->id),$gparam);
-        $timetables = $DB->get_records_select('objectives_timetable',
+        $timetables = $DB->get_records_select('block_objectives_timetable',
                                               'objectivesid = ? AND groupid '.$gsql,
                                               $params, 'day, starttime, groupid');
 
@@ -383,7 +383,7 @@ class block_objectives_class {
         } else {
             list($tsql, $tparam) = $DB->get_in_or_equal(array_keys($timetables));
             $params = array_merge(array($weekstart),$tparam);
-            $objectives = $DB->get_records_select('objectives_objectives',
+            $objectives = $DB->get_records_select('block_objectives_objectives',
                                                   'weekstart = ? AND timetableid '.$tsql,
                                                   $params);
         }
@@ -487,7 +487,7 @@ class block_objectives_class {
         }
 
         // TODO limit to only show objectives for selected group
-        $timetables = $DB->get_records('objectives_timetable', array('objectivesid'=>$this->settings->id), 'day, starttime, groupid');
+        $timetables = $DB->get_records('block_objectives_timetable', array('objectivesid'=>$this->settings->id), 'day, starttime, groupid');
         if (empty($timetables)) {
             if ($canedittimetables) {
                 $this->edit_timetables();
@@ -515,7 +515,7 @@ class block_objectives_class {
         // Load all the objectives for the selected week
         list($tsql, $tparam) = $DB->get_in_or_equal(array_keys($timetables));
         $params = array_merge(array($weekstart),$tparam);
-        $objectives = $DB->get_records_select('objectives_objectives', 'weekstart = ? AND timetableid '.$tsql, $params);
+        $objectives = $DB->get_records_select('block_objectives_objectives', 'weekstart = ? AND timetableid '.$tsql, $params);
 
         $formdata = array();
         $formdata['weekstart'] = $weekstart;
@@ -540,12 +540,12 @@ class block_objectives_class {
                         if ($dbobj->timetableid == $timetableid) {
                             $addnew = false;
                             if (trim($obj) == '') {
-                                $DB->delete_records('objectives_objectives',array('id'=>$dbobj->id));
+                                $DB->delete_records('block_objectives_objectives',array('id'=>$dbobj->id));
                             } elseif ($this->remove_checkedoff($dbobj->objectives) != $obj) {
                                 $upd = new stdClass;
                                 $upd->id = $dbobj->id;
                                 $upd->objectives = $this->add_not_checkedoff($obj);
-                                $DB->update_record('objectives_objectives',$upd);
+                                $DB->update_record('block_objectives_objectives',$upd);
                             }
                         }
                     }
@@ -555,7 +555,7 @@ class block_objectives_class {
                     $new->timetableid = $timetableid;
                     $new->weekstart = $weekstart;
                     $new->objectives = $this->add_not_checkedoff($obj);
-                    $new->id = $DB->insert_record('objectives_objectives',$new);
+                    $new->id = $DB->insert_record('block_objectives_objectives',$new);
                 }
             }
 
@@ -602,7 +602,7 @@ class block_objectives_class {
             }
         }
 
-        $timetables = $DB->get_records('objectives_timetable', array('objectivesid'=>$this->settings->id), 'day, starttime, groupid');
+        $timetables = $DB->get_records('block_objectives_timetable', array('objectivesid'=>$this->settings->id), 'day, starttime, groupid');
         $days = array('monday'=>array(), 'tuesday'=>array(), 'wednesday'=>array(),
                          'thursday'=>array(), 'friday'=>array(), 'saturday'=>array(),
                          'sunday'=>array());
@@ -657,11 +657,11 @@ class block_objectives_class {
                         $new->day = $data->lday[$lid];
                         $new->starttime = make_timestamp(0, 0, 0, $data->lstarthour[$lid], $data->lstartminute[$lid], 0);
                         $new->endtime = make_timestamp(0, 0, 0, $data->lendhour[$lid], $data->lendminute[$lid], 0);
-                        $new->id = $DB->insert_record('objectives_timetable', $new);
+                        $new->id = $DB->insert_record('block_objectives_timetable', $new);
                     }
                 } else { // Existing entry
                     if ($lgroup < 0) { // Entry disabled
-                        $DB->delete_records('objectives_timetable',array('id'=>$lid,'objectivesid'=>$this->settings->id)); // Added 'objectivesid' check, just to be on the safe side
+                        $DB->delete_records('block_objectives_timetable',array('id'=>$lid,'objectivesid'=>$this->settings->id)); // Added 'objectivesid' check, just to be on the safe side
                     } else { // Update entry (if changed)
                         $upd = new stdClass;
                         $upd->id = $lid;
@@ -675,7 +675,7 @@ class block_objectives_class {
                             $upd->starttime != $timetables[$lid]->starttime ||
                             $upd->endtime != $timetables[$lid]->endtime) {  // Something has changed
                             if ($upd->day == $timetables[$lid]->day && $upd->objectivesid == $timetables[$lid]->objectivesid) {
-                                $DB->update_record('objectives_timetable',$upd);
+                                $DB->update_record('block_objectives_timetable',$upd);
                             } else {
                                 $this->print_header();
                                 error('Attempting to update record that does not match database');

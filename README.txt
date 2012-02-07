@@ -12,6 +12,7 @@ Other features include:
 
 ==Recent changes==
 
+2012-02-07 - Renamed all database tables to match new strict requirements on Moodle.org
 2012-02-06 - Minor changes to improve 2.2 compatibility
 
 ==Installation==
