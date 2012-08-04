@@ -37,7 +37,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="timetableid"/>
-        <KEY NAME="timetableid" TYPE="foreign" FIELDS="timetableid" REFTABLE="objectives_timetable" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="timetableid" TYPE="foreign" FIELDS="timetableid" REFTABLE="block_objectives_timetable" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="weekstart" UNIQUE="false" FIELDS="timetableid, weekstart"/>
