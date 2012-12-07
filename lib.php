@@ -181,7 +181,7 @@ class block_objectives_class {
     }
 
     function get_block_text() {
-        global $USER, $DB, $OUTPUT, $PAGE;
+        global $USER, $DB, $OUTPUT, $PAGE, $CFG;
 
         if (!$this->can_view_objectives()) {
             return null;
@@ -320,9 +320,15 @@ class block_objectives_class {
             $startfull = optional_param('lesson_objectives_fullscreen',0,PARAM_INT);
             $fsicon = $OUTPUT->pix_url('fullscreen_maximize','block_objectives');
 
-            $jsmodule = array('name' => 'block_objectives',
-                              'fullpath' => new moodle_url('/blocks/objectives/objectives.js'),
-                              'requires' => array('yui2-yahoo','yui2-dom','yui2-container','yui2-animation'));
+            if ($CFG->version < 2012120300) { // < Moodle 2.4
+                $jsmodule = array('name' => 'block_objectives',
+                                  'fullpath' => new moodle_url('/blocks/objectives/objectives.js'),
+                                  'requires' => array('yui2-yahoo','yui2-dom','yui2-container','yui2-animation'));
+            } else { // Moodle 2.4
+                $jsmodule = array('name' => 'block_objectives',
+                                  'fullpath' => new moodle_url('/blocks/objectives/objectives24.js'),
+                                  'requires' => array());
+            }
             $params = array($fsicon->out(), get_string('fullscreen','block_objectives'), $startfull);
             $PAGE->requires->js_init_call('M.block_objectives.init_fullscreen', $params, true, $jsmodule);
         }

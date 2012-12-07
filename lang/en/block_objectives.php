@@ -38,11 +38,11 @@ $string['objectives:checkoffobjectives'] = 'Tick-off lesson objectives for the c
 $string['objectives:editobjectives'] = 'Able to edit lesson objectives';
 $string['objectives:edittimetables'] = 'Able to edit timetables for lessons';
 $string['objectives:viewobjectives'] = 'Able to view lesson objectives';
+$string['objectives:addinstance'] = 'Add Objectives block to My Moodle page';
+$string['objectives:myaddinstance'] = 'Add new Objectives block';
 $string['pluginname'] = 'Lesson objectives';
 $string['prevweek'] = 'Previous week';
 $string['saveandcourse'] = 'Save and return to course';
 $string['saveandobjectives'] = 'Save and edit objectives';
 $string['viewobjectives'] = 'View objectives';
 $string['weekbegining'] = 'Week beginning';
-
-?>
