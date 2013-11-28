@@ -593,7 +593,7 @@ class block_objectives_class {
     }
 
     function edit_timetables() {
-        global $DB, $OUTPUT, $PAGE;
+        global $DB, $OUTPUT;
 
         $caneditobjectives = $this->can_edit_objectives();
         $canedittimetables = $this->can_edit_timetables();
@@ -618,7 +618,6 @@ class block_objectives_class {
         $settings['course'] = $this->course->id;
 
         if ($timetables) {
-            $weekday = 0;
             reset($days);
             foreach ($timetables as $lesson) {
                 $days[$num2day[$lesson->day]][] = $lesson->id; // Store the id to use when creating the form
@@ -769,6 +768,7 @@ class block_objectives_timetable_form extends moodleform {
                 $mform->disabledIf("lendminute[$lid]","lgroup[$lid]",'eq',-1);
 
                 $lel[] =& $mform->createElement('hidden',"lday[$lid]",$weekday);
+                $mform->setType("lday[$lid]", PARAM_INT);
 
                 $mform->addGroup($lel, 'lesson'.$lid.'group', get_string('lesson','block_objectives'), array(''), false);
             }

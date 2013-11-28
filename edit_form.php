@@ -20,6 +20,7 @@ class block_objectives_edit_form extends block_edit_form {
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
         $mform->addElement('text', 'objectivesintro', get_string('introduction','block_objectives'), array('size' => 60));
+        $mform->setType('objectivesintro', PARAM_TEXT);
 
         $mform->addElement('hidden', 'objectivesid', 0);
         $mform->setType('objectivesid', PARAM_INT);
