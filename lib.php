@@ -114,7 +114,7 @@ class block_objectives_class {
             $dateinfo = getdate();
         }
 
-        $timenow = make_timestamp(0, 0, 0, $dateinfo['hours'], $dateinfo['minutes'], $dateinfo['seconds']);
+        $timenow = mktime((int)$dateinfo['hours'], (int)$dateinfo['minutes'], (int)$dateinfo['seconds'], 0, 0, 0);
         return $timenow;
     }
 

@@ -12,6 +12,7 @@ Other features include:
 
 ==Recent changes==
 
+2014-04-25 - Fix timezone handling when displaying current objectives.
 2013-11-28 - Minor 2.6 compatibility fixes
 2012-12-07 - Moodle 2.4 compatibility fixes
 2012-02-07 - Renamed all database tables to match new strict requirements on Moodle.org
