@@ -40,6 +40,7 @@ $string['objectives:edittimetables'] = 'Able to edit timetables for lessons';
 $string['objectives:viewobjectives'] = 'Able to view lesson objectives';
 $string['objectives:addinstance'] = 'Add Objectives block to My Moodle page';
 $string['objectives:myaddinstance'] = 'Add new Objectives block';
+$string['objectiveupdated'] = 'Objective updated';
 $string['pluginname'] = 'Lesson objectives';
 $string['prevweek'] = 'Previous week';
 $string['saveandcourse'] = 'Save and return to course';

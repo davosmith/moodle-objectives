@@ -256,6 +256,8 @@ class block_objectives_class {
                             $upd->id = $objsel->id;
                             $upd->objectives = implode("\n",$objarray);
                             $DB->update_record('block_objectives_objectives',$upd);
+
+                            $this->log_update($objsel->id, false);
                         }
                     }
                 } elseif ($completeobj) {
@@ -267,6 +269,8 @@ class block_objectives_class {
                             $upd->id = $objsel->id;
                             $upd->objectives = implode("\n",$objarray);
                             $DB->update_record('block_objectives_objectives',$upd);
+
+                            $this->log_update($objsel->id, true);
                         }
                     }
                 }
@@ -334,6 +338,19 @@ class block_objectives_class {
         }
 
         return $text;
+    }
+
+    protected function log_update($objectivesid, $completed) {
+        global $CFG;
+        if ($CFG->version > 2014051200) { // Moodle 2.7+
+            $params = array(
+                'contextid' => $this->context->id,
+                'objectid' => $objectivesid,
+                'other' => array('completed' => $completed),
+            );
+            $event = \block_objectives\event\objective_updated::create($params);
+            $event->trigger();
+        }
     }
 
     function get_block_footer() {
