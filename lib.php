@@ -68,6 +68,45 @@ class block_objectives_class {
         return date('Ymd', $timestamp);
     }
 
+    /**
+     * For Behat testing - override the current time, so that tests can run in a consistent state
+     *
+     * @param int $timestamp
+     */
+    public static function override_current_time($timestamp) {
+        set_config('block_objectives_time_override', $timestamp);
+    }
+
+    /**
+     * Usually calls getdate for the current time, but that time can be overridden (for use in Behat tests).
+     *
+     * @return array
+     */
+    private static function getdate_now() {
+        global $CFG;
+
+        if (empty($CFG->block_objectives_time_override)) {
+            return getdate();
+        } else {
+            return getdate($CFG->block_objectives_time_override);
+        }
+    }
+
+    /**
+     * Returns the current timestamp, unless overridden (for Behat tests).
+     *
+     * @return int
+     */
+    private static function time_now() {
+        global $CFG;
+
+        if (empty($CFG->block_objectives_time_override)) {
+            return time();
+        } else {
+            return $CFG->block_objectives_time_override;
+        }
+    }
+
     // Get string representing start of week in YYYYMMDD format
     function getweekstart($weekstart=null) {
         if ($weekstart and strlen($weekstart) == 8) {
@@ -77,7 +116,7 @@ class block_objectives_class {
                 return $weekstart;
             }
         } else {
-            $dateinfo = getdate();
+            $dateinfo = self::getdate_now();
         }
 
         $wday = ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0
@@ -99,7 +138,7 @@ class block_objectives_class {
         if ($timestamp) {
             $dateinfo = getdate($timestamp);
         } else {
-            $dateinfo = getdate();
+            $dateinfo = self::getdate_now();
         }
 
         $wday = ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0
@@ -111,7 +150,7 @@ class block_objectives_class {
         if ($timestamp) {
             $dateinfo = getdate($timestamp);
         } else {
-            $dateinfo = getdate();
+            $dateinfo = self::getdate_now();
         }
 
         $timenow = mktime((int)$dateinfo['hours'], (int)$dateinfo['minutes'], (int)$dateinfo['seconds'], 0, 0, 0);
@@ -219,7 +258,7 @@ class block_objectives_class {
         $params = array_merge(array($weekstart, $this->settings->id, $day, $timenow, $timenow), $gparam);
         $objectives = $DB->get_records_sql($sql, $params);
 
-        $text = '<strong>'.userdate(time(), get_string('strftimedaydate')).'</strong>';
+        $text = '<strong>'.userdate(self::time_now(), get_string('strftimedaydate')).'</strong>';
 
         if (!$objectives) {
             $text .= '<br/>';
@@ -236,13 +275,16 @@ class block_objectives_class {
                 $objsel = reset($objectives);
             }
             $objarray = explode("\n", $objsel->objectives);
-            $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objectives').'" alt="'.get_string('complete','block_objectives').'" />',
-                           '-'=>'<img src="'.$OUTPUT->pix_url('empty_box','block_objectives').'" alt="'.get_string('incomplete','block_objectives').'" />');
+            $icons = array('+'=>'<img src="'.$OUTPUT->pix_url('tick_box','block_objectives').'" alt="'.
+                get_string('complete','block_objectives').'" class="complete" />',
+                           '-'=>'<img src="'.$OUTPUT->pix_url('empty_box','block_objectives').'" alt="'.
+                               get_string('incomplete','block_objectives').'" class="incomplete" />');
 
             if ($cancheckoff) {
                 $link = array('+'=>'<a href="'.$courseurl->out(true, array('incomplete_objective'=>$objsel->id)).':%d" >',
                               '-'=>'<a href="'.$courseurl->out(true, array('complete_objective'=>$objsel->id)).':%d" >');
             }
+            $class = array('+' => 'complete', '-' => 'incomplete');
 
             if ($cancheckoff) {
                 $incompleteobj = optional_param('incomplete_objective',false,PARAM_TEXT);
@@ -297,7 +339,7 @@ class block_objectives_class {
                     $indent++;
                     $objtext .= '<ul>';
                 }
-                $objtext .= '<li>';
+                $objtext .= '<li class="'.$class[$complete].'">';
                 if ($cancheckoff) { // Add a 'check-off' link
                     $objtext .= sprintf($link[$complete],$idx);
                 }
@@ -677,8 +719,8 @@ class block_objectives_class {
                         $new->objectivesid = $this->settings->id;
                         $new->groupid = $lgroup;
                         $new->day = $data->lday[$lid];
-                        $new->starttime = make_timestamp(0, 0, 0, $data->lstarthour[$lid], $data->lstartminute[$lid], 0);
-                        $new->endtime = make_timestamp(0, 0, 0, $data->lendhour[$lid], $data->lendminute[$lid], 0);
+                        $new->starttime = $this->make_timestamp($data->lstarthour[$lid], $data->lstartminute[$lid]);
+                        $new->endtime = $this->make_timestamp($data->lendhour[$lid], $data->lendminute[$lid]);
                         $new->id = $DB->insert_record('block_objectives_timetable', $new);
                     }
                 } else { // Existing entry
@@ -690,8 +732,8 @@ class block_objectives_class {
                         $upd->objectivesid = $this->settings->id;
                         $upd->groupid = $lgroup;
                         $upd->day = $data->lday[$lid];
-                        $upd->starttime = make_timestamp(0, 0, 0, $data->lstarthour[$lid], $data->lstartminute[$lid], 0);
-                        $upd->endtime = make_timestamp(0, 0, 0, $data->lendhour[$lid], $data->lendminute[$lid], 0);
+                        $upd->starttime = $this->make_timestamp($data->lstarthour[$lid], $data->lstartminute[$lid]);
+                        $upd->endtime = $this->make_timestamp($data->lendhour[$lid], $data->lendminute[$lid]);
 
                         if ($upd->groupid != $timetables[$lid]->groupid ||
                             $upd->starttime != $timetables[$lid]->starttime ||
@@ -719,6 +761,32 @@ class block_objectives_class {
         echo $OUTPUT->box(get_string('edittimetablesinst','block_objectives'));
         $mform->display();
         $this->print_footer();
+    }
+
+    /**
+     * Moodle has introduced a change that broke my timestamp code, so I'm reproducing the original code here.
+     */
+    private function make_timestamp($hour, $minute) {
+        global $CFG;
+        if ($CFG->branch < 29) {
+            $timezone = get_user_timezone_offset(99);
+        } else {
+            $tz = core_date::get_user_timezone();
+            $date = new DateTime('now', new DateTimeZone($tz));
+            $timezone = ($date->getOffset() - dst_offset_on(time(), $tz)) / (3600.0);
+        }
+
+        if (abs($timezone) > 13) {
+            // Server time.
+            $time = mktime((int)$hour, (int)$minute, 0, 0, 0, 0);
+        } else {
+            $time = gmmktime((int)$hour, (int)$minute, 0, 0, 0, 0);
+            $time = usertime($time, $timezone);
+
+            // Apply dst for string timezones or if 99 then try dst offset with user's default timezone.
+            $time -= dst_offset_on($time, 99);
+        }
+        return $time;
     }
 
     function print_header() {

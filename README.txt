@@ -12,6 +12,7 @@ Other features include:
 
 ==Recent changes==
 
+2015-06-20 - Major 2.9 compatibility fix (changes to Moodle date time handling broke the timetable editing); full set of automated tests added
 2014-07-06 - Minor 2.7 compatibility fixes
 2014-04-25 - Fix timezone handling when displaying current objectives.
 2013-11-28 - Minor 2.6 compatibility fixes
@@ -44,4 +45,4 @@ During a lesson, a teacher can click on an objective to toggle the 'tick' box be
 
 ==Contact==
 
-Any questions or suggestions for improvement, please drop an email to "davo AT davodev DOT co DOT uk" or visit http://www.davodev.co.uk
+Any questions or suggestions for improvement, please drop an email to: moodle@davosmith.co.uk
