@@ -24,7 +24,7 @@ class block_objectives_class {
     var $context;
     var $course;
 
-    function block_objectives_class($course) {
+    public function __construct($course) {
         global $DB, $CFG;
 
         if (is_int($course)) {
