@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Lesson Objectives plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -19,22 +18,22 @@ require_once(dirname(__FILE__).'/lib.php');
 
 class block_objectives extends block_base {
 
-    function init() {
-        $this->title = get_string('pluginname','block_objectives');
+    public function init() {
+        $this->title = get_string('pluginname', 'block_objectives');
     }
 
     function applicable_formats() {
-        return array('all'=>false, 'course'=>true);
+        return array('all' => false, 'course' => true);
     }
 
-    function preferred_width() {
+    public function preferred_width() {
         return 240;
     }
 
     function get_content() {
         global $COURSE;
 
-        if ($this->content !== NULL) {
+        if ($this->content !== null) {
             return $this->content;
         }
 

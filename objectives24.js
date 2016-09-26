@@ -33,7 +33,7 @@ M.block_objectives.init_fullscreen = function (Y, icon, alt, startfull) {
             el.innerHTML = '<a href="#" onclick="M.block_objectives.show_fullscreen()"><img src="' + icon + '" alt="' + alt + '" /></a>';
         }
 
-        vis = startfull > 0;
+        vis = startfull>0;
 
         self.panel = new YAHOO.widget.Panel('lesson_objectives_fullscreen', {
             width: "800px",

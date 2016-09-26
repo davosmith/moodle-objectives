@@ -75,13 +75,16 @@ class objective_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/checklist/report.php', array('id' => $this->contextinstanceid,
-                                                                  'studentid' => $this->userid));
+        return new \moodle_url('/mod/checklist/report.php', array(
+            'id' => $this->contextinstanceid,
+            'studentid' => $this->userid
+        ));
     }
 
     protected function validate_data() {
         if (!isset($this->other['completed'])) {
-            throw new \coding_exception("Must specify '\$other['completed']' - whether the objective was marked as completed or not");
+            throw new \coding_exception("Must specify '\$other['completed']' - whether the objective ".
+                                        "was marked as completed or not");
         }
     }
 }

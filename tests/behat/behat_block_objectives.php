@@ -26,7 +26,7 @@
 
 use Behat\Gherkin\Node\TableNode;
 
-require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
+require_once(__DIR__.'/../../../../lib/behat/behat_base.php');
 
 /**
  * Steps definitions related to the objectives block.
@@ -42,6 +42,7 @@ class behat_block_objectives extends behat_base {
      * The page is also reloaded (to make sure the change appears immediately).
      *
      * @When /^I force the objectives block current time to "(?P<date_string>[^"]*)"$/
+     * @param string $datestring
      */
     public function i_force_the_objectives_block_current_time_to($datestring) {
         global $CFG;
@@ -196,7 +197,7 @@ class behat_block_objectives extends behat_base {
             );
             $timetable = $DB->get_record('block_objectives_timetable', $params, 'id', MUST_EXIST);
             $obj = explode(',', $row['objectives']);
-            $obj = array_map(function($obj) {
+            $obj = array_map(function ($obj) {
                 return '-'.$obj;
             }, $obj);
             $obj = implode("\n", $obj);

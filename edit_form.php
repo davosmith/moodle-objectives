@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Lesson Objectives plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -19,7 +18,7 @@ class block_objectives_edit_form extends block_edit_form {
     protected function specific_definition($mform) {
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
-        $mform->addElement('text', 'objectivesintro', get_string('introduction','block_objectives'), array('size' => 60));
+        $mform->addElement('text', 'objectivesintro', get_string('introduction', 'block_objectives'), array('size' => 60));
         $mform->setType('objectivesintro', PARAM_TEXT);
 
         $mform->addElement('hidden', 'objectivesid', 0);
@@ -42,18 +41,18 @@ class block_objectives_edit_form extends block_edit_form {
 
         parent::set_data($defaults);
 
-        // If the form has been submitted
+        // If the form has been submitted.
         if (!$this->is_cancelled() && $this->is_submitted() && $this->is_validated()) {
             $mform = $this->_form;
             $data = (object)$mform->exportValues();
             if ($data->action == 'savesettings') {
-                // Save out the settings I am interested in
+                // Save out the settings I am interested in.
                 $upd = new stdClass;
                 $upd->id = $data->objectivesid;
                 $upd->intro = $data->objectivesintro;
-                $DB->update_record('block_objectives',$upd);
+                $DB->update_record('block_objectives', $upd);
 
-                // Remove these, to prevent them being saved into the block config
+                // Remove these, to prevent them being saved into the block config.
                 $mform->removeElement('objectivesintro');
                 $mform->removeElement('objectivesid');
                 $mform->removeElement('course');

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Objectives block for Moodle
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -35,7 +34,6 @@ class restore_objectives_block_structure_step extends restore_structure_step {
 
         $paths = array();
 
-        //$paths[] = new restore_path_element('block', '/block', true);
         $paths[] = new restore_path_element('objectives', '/block/objectives');
         $paths[] = new restore_path_element('objectives_timetable', '/block/objectives/objectives_timetables/objectives_timetable');
         $paths[] = new restore_path_element('objectives_objective', '/block/objectives/objectives_timetables/objectives_timetable/objectives_objectives/objectives_objective');
@@ -48,7 +46,7 @@ class restore_objectives_block_structure_step extends restore_structure_step {
 
         $data = (object)$data;
 
-        // For any reason (non multiple, dupe detected...) block not restored, return
+        // For any reason (non multiple, dupe detected...) block not restored, return.
         if (!$this->task->get_blockid()) {
             echo "No blockid";
             return;
