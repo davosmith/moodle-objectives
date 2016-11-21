@@ -61,13 +61,13 @@ Feature: Lesson objectives editing works as expected
     And I follow "Course 1"
     And I follow "Edit objectives"
     And I should see "Week beginning Monday, 1 June 2015"
-    And I set the field "10:25 AM-11:45 AM" to multiline
+    And I set the field "10:25 AM-11:45 AM" to multiline:
     """
     Objective 1
     Objective 2
      Objective 2a
     """
-    And I set the field "3:00 PM-5:00 PM" to multiline
+    And I set the field "3:00 PM-5:00 PM" to multiline:
     """
     Another objective
     One more thing to do

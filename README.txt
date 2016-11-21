@@ -12,6 +12,7 @@ Other features include:
 
 ==Recent changes==
 
+2016-11-21 - Minor 3.2 compatibility fix (only behat tests affected)
 2015-06-20 - Major 2.9 compatibility fix (changes to Moodle date time handling broke the timetable editing); full set of automated tests added
 2014-07-06 - Minor 2.7 compatibility fixes
 2014-04-25 - Fix timezone handling when displaying current objectives.
