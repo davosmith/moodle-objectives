@@ -15,7 +15,7 @@ Feature: The custom steps work as expected
       | course | idnumber | name   |
       | C1     | Group1   | Group1 |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add the "Lesson objectives" block
 

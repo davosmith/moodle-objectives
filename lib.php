@@ -288,10 +288,10 @@ class block_objectives_class {
             }
             $objarray = explode("\n", $objsel->objectives);
             $icons = array(
-                '+' => '<img src="'.$OUTPUT->pix_url('tick_box', 'block_objectives').'" alt="'.
-                    get_string('complete', 'block_objectives').'" class="complete" />',
-                '-' => '<img src="'.$OUTPUT->pix_url('empty_box', 'block_objectives').'" alt="'.
-                    get_string('incomplete', 'block_objectives').'" class="incomplete" />'
+                '+' => $OUTPUT->pix_icon('tick_box', get_string('complete', 'block_objectives'),
+                                         'block_objectives', ['class' => 'complete']),
+                '-' => $OUTPUT->pix_icon('empty_box', get_string('incomplete', 'block_objectives'),
+                                         'block_objectives', ['class' => 'incomplete']),
             );
 
             if ($cancheckoff) {
@@ -381,7 +381,11 @@ class block_objectives_class {
             $text .= $groupsmenu;
 
             $startfull = optional_param('lesson_objectives_fullscreen', 0, PARAM_INT);
-            $fsicon = $OUTPUT->pix_url('fullscreen_maximize', 'block_objectives');
+            if ($CFG->branch < 33) {
+                $fsicon = $OUTPUT->pix_url('fullscreen_maximize', 'block_objectives');
+            } else {
+                $fsicon = $OUTPUT->image_url('fullscreen_maximize', 'block_objectives');
+            }
 
             if ($CFG->version < 2012120300) { // < Moodle 2.4.
                 $jsmodule = array(
@@ -480,8 +484,10 @@ class block_objectives_class {
 
         $num2day = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
         $icons = array(
-            '+' => '<img src="'.$OUTPUT->pix_url('tick_box', 'block_objectives').'" alt="'.get_string('complete', 'block_objectives').'" />',
-            '-' => '<img src="'.$OUTPUT->pix_url('empty_box', 'block_objectives').'" alt="'.get_string('incomplete', 'block_objectives').'" />'
+            '+' => $OUTPUT->pix_icon('tick_box', get_string('complete', 'block_objectives'),
+                                     'block_objectives'),
+            '-' => $OUTPUT->pix_icon('empty_box', get_string('incomplete', 'block_objectives'),
+                                     'block_objectives'),
         );
         $this->print_header();
         echo $OUTPUT->heading(get_string('viewobjectives', 'block_objectives'));

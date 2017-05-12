@@ -15,7 +15,7 @@ Feature: Lesson objectives editing works as expected
       | course | idnumber | name   |
       | C1     | Group1   | Group1 |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add the "Lesson objectives" block
     And I force the objectives block current time to "15:00 2 june 2015"
@@ -23,7 +23,7 @@ Feature: Lesson objectives editing works as expected
 
   Scenario: A teacher can create a timetable
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Edit objectives"
     And I should see "Edit timetables"
 
@@ -58,7 +58,7 @@ Feature: Lesson objectives editing works as expected
       | Monday  | 2:10 PM   | 4:45 PM  |
       | Tuesday | 3 PM      | 5 PM     |
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Edit objectives"
     And I should see "Week beginning Monday, 1 June 2015"
     And I set the field "10:25 AM-11:45 AM" to multiline:
