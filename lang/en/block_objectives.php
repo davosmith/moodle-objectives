@@ -44,6 +44,7 @@ $string['objectives:myaddinstance'] = 'Add new Objectives block';
 $string['objectiveupdated'] = 'Objective updated';
 $string['pluginname'] = 'Lesson objectives';
 $string['prevweek'] = 'Previous week';
+$string['privacy:null_reason'] = 'The lesson objectives block stores timetable and objectives information per group, but does not store any information specific to individuals';
 $string['saveandcourse'] = 'Save and return to course';
 $string['saveandobjectives'] = 'Save and edit objectives';
 $string['viewobjectives'] = 'View objectives';

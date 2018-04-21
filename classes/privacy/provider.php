@@ -1,5 +1,5 @@
 <?php
-// This file is part of the Lesson Objectives plugin for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,11 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * GDPR declaration
+ *
+ * @package   block_objectives
+ * @copyright 2018 Davo Smith
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace block_objectives\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018042100;
-$plugin->cron = 0;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.4+ (Build: 2017051200)';
-$plugin->component = 'block_objectives';
-$plugin->requires = 2017111300; // Moodle 3.4+
+class provider implements \core_privacy\local\metadata\null_provider {
+    public static function get_reason() : string {
+        return 'privacy:null_reason';
+    }
+}
