@@ -1,6 +1,7 @@
 /* -*-CSS-*- */
 
-.lesson_objectives_list li, .lesson_objectives_list ul li {
+.lesson_objectives_list li,
+.lesson_objectives_list ul li {
     list-style-type: none;
     padding-left: 0;
     margin-left: 0;
@@ -26,7 +27,8 @@
     display: inline-block;
 }
 
-.lesson_objectives_list a:link, .lesson_objectives_list a:visited {
+.lesson_objectives_list a:link,
+.lesson_objectives_list a:visited {
     color: black;
 }
 

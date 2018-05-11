@@ -15,22 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die();
-
-/**
- * @package moodlecore
- * @subpackage backup-moodle2
- * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 global $CFG;
 require_once($CFG->dirroot.'/blocks/objectives/backup/moodle2/restore_objectives_stepslib.php');
 
-/**
- * Specialised restore task for the objectives block
- * (has own DB structures to backup)
- *
- */
 class restore_objectives_block_task extends restore_block_task {
 
     protected function define_my_settings() {

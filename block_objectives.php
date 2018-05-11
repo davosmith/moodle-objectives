@@ -24,7 +24,7 @@ class block_objectives extends block_base {
         $this->title = get_string('pluginname', 'block_objectives');
     }
 
-    function applicable_formats() {
+    public function applicable_formats() {
         return array('all' => false, 'course' => true);
     }
 
@@ -32,7 +32,7 @@ class block_objectives extends block_base {
         return 240;
     }
 
-    function get_content() {
+    public function get_content() {
         global $COURSE;
 
         if ($this->content !== null) {
@@ -48,7 +48,7 @@ class block_objectives extends block_base {
         return $this->content;
     }
 
-    function instance_allow_config() {
+    public function instance_allow_config() {
         return true;
     }
 }

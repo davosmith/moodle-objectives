@@ -20,9 +20,8 @@ function xmldb_block_objectives_upgrade($oldversion = 0) {
     global $DB;
 
     $dbman = $DB->get_manager();
-    $result = true;
 
-    if ($result && $oldversion < 2011040900) {
+    if ($oldversion < 2011040900) {
         // Define field weekstartstr to be added to objectives_objectives.
         $table = new xmldb_table('objectives_objectives');
         $field = new xmldb_field('weekstartstr', XMLDB_TYPE_CHAR, '8', null, null, null, null, 'weekstart');
@@ -65,14 +64,14 @@ function xmldb_block_objectives_upgrade($oldversion = 0) {
         upgrade_block_savepoint(true, 2011040900, 'objectives');
     }
 
-    if ($result && $oldversion < 2011040901) {
+    if ($oldversion < 2011040901) {
         // Update all old lesson timestamps, using make_timestamp.
         $lessons = $DB->get_records_select('objectives_timetable', 'starttime < 86400');
         foreach ($lessons as $lesson) {
-            $starthour = intval($lesson->starttime / (60 * 60));
-            $startmin = intval($lesson->starttime / 60) % 60;
-            $endhour = intval($lesson->endtime / (60 * 60));
-            $endmin = intval($lesson->endtime / 60) % 60;
+            $starthour = (int)($lesson->starttime / (60 * 60));
+            $startmin = (int)($lesson->starttime / 60) % 60;
+            $endhour = (int)($lesson->endtime / (60 * 60));
+            $endmin = (int)($lesson->endtime / 60) % 60;
 
             $updlesson = new stdClass;
             $updlesson->id = $lesson->id;
@@ -85,7 +84,7 @@ function xmldb_block_objectives_upgrade($oldversion = 0) {
         upgrade_block_savepoint(true, 2011040901, 'objectives');
     }
 
-    if ($result && $oldversion < 2012020700) {
+    if ($oldversion < 2012020700) {
         $table = new xmldb_table('objectives');
         $dbman->rename_table($table, 'block_objectives');
 
@@ -99,5 +98,5 @@ function xmldb_block_objectives_upgrade($oldversion = 0) {
         upgrade_block_savepoint(true, 2012020700, 'objectives');
     }
 
-    return $result;
+    return true;
 }

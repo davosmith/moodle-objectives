@@ -25,7 +25,7 @@ class block_objectives_class {
     public $course;
 
     public function __construct($course) {
-        global $DB, $CFG;
+        global $DB;
 
         if (is_int($course)) {
             $course = $DB->get_record('course', array('id' => $course), '*', MUST_EXIST);
@@ -41,11 +41,7 @@ class block_objectives_class {
             $this->settings->id = $DB->insert_record('block_objectives', $this->settings);
         }
 
-        if ($CFG->version < 2011120100) {
-            $this->context = get_context_instance(CONTEXT_COURSE, $course->id);
-        } else {
-            $this->context = context_course::instance($course->id);
-        }
+        $this->context = context_course::instance($course->id);
     }
 
     public function get_settings() {
@@ -70,8 +66,8 @@ class block_objectives_class {
 
     // Convert weekstart into a timestamp (noon on that day).
     public function ws2ts($weekstart) {
-        return mktime(12, 0, 0, intval(substr($weekstart, 4, 2)), intval(substr($weekstart, 6, 2)),
-                      intval(substr($weekstart, 0, 4)));
+        return mktime(12, 0, 0, (int)(substr($weekstart, 4, 2)), (int)(substr($weekstart, 6, 2)),
+                      (int)(substr($weekstart, 0, 4)));
     }
 
     // Convert a timestamp into 'YYYYMMDD' for that day.
@@ -98,9 +94,8 @@ class block_objectives_class {
 
         if (empty($CFG->block_objectives_time_override)) {
             return getdate();
-        } else {
-            return getdate($CFG->block_objectives_time_override);
         }
+        return getdate($CFG->block_objectives_time_override);
     }
 
     /**
@@ -113,14 +108,13 @@ class block_objectives_class {
 
         if (empty($CFG->block_objectives_time_override)) {
             return time();
-        } else {
-            return $CFG->block_objectives_time_override;
         }
+        return $CFG->block_objectives_time_override;
     }
 
     // Get string representing start of week in YYYYMMDD format.
     public function getweekstart($weekstart = null) {
-        if ($weekstart and strlen($weekstart) == 8) {
+        if ($weekstart && strlen($weekstart) === 8) {
             $ts = $this->ws2ts($weekstart);
             $dateinfo = getdate($ts);
             if ($dateinfo['wday'] == 1) { // Passed in string was for a Monday.
@@ -134,14 +128,14 @@ class block_objectives_class {
 
         // Work out noon today.
         $weekstartts = mktime(12, 0, 0, $dateinfo['mon'], $dateinfo['mday'], $dateinfo['year']);
-        $weekstartts -= (24 * 60 * 60) * $wday; // Subtract number of days to get back to Monday.
+        $weekstartts -= DAYSECS * $wday; // Subtract number of days to get back to Monday.
         return $this->ts2ws($weekstartts); // Convert to string YYYYMMDD.
     }
 
     public function addweek($weekstart, $offset) {
         // Work out timestamp for noon on specified day.
         $ts = $this->ws2ts($weekstart);
-        $ts += 7 * 24 * 60 * 60 * $offset; // Add on number of weeeks requested.
+        $ts += WEEKSECS * $offset; // Add on number of weeeks requested.
         return $this->ts2ws($ts); // Convert to string YYYYMMDD.
     }
 
@@ -151,9 +145,7 @@ class block_objectives_class {
         } else {
             $dateinfo = self::getdate_now();
         }
-
-        $wday = ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0.
-        return $wday;
+        return ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0.
     }
 
     // Seconds since the start of today.
@@ -176,7 +168,7 @@ class block_objectives_class {
             return false;
         }
 
-        if (count($objectives) == 1) {
+        if (count($objectives) === 1) {
             return reset($objectives);
         }
 
@@ -184,7 +176,7 @@ class block_objectives_class {
             $SESSION->objectives_group = array(); // Create the SESSION array, if it doesn't already exist.
         }
         $changegroup = optional_param('objectives_group', -1, PARAM_INT);
-        if ($changegroup != -1) {
+        if ($changegroup !== -1) {
             foreach ($objectives as $obj) {
                 if ($obj->groupid == $changegroup) {
                     $SESSION->objectives_group[$this->course->id] = $changegroup;
@@ -228,11 +220,11 @@ class block_objectives_class {
         $baseurl = new moodle_url('/course/view.php', array('id' => $this->course->id));
 
         return get_string('view').': <span class="lesson_objectives_groupsmenu">'.
-        $OUTPUT->single_select($baseurl, 'objectives_group', $groupsmenu, $selected->groupid).'</span>';
+            $OUTPUT->single_select($baseurl, 'objectives_group', $groupsmenu, $selected->groupid).'</span>';
     }
 
     public function get_block_text() {
-        global $USER, $DB, $OUTPUT, $PAGE, $CFG;
+        global $USER, $DB, $OUTPUT, $PAGE;
 
         if (!$this->can_view_objectives()) {
             return null;
@@ -344,14 +336,14 @@ class block_objectives_class {
             foreach ($objarray as $obj) {
                 $complete = substr($obj, 0, 1);
                 $obj = substr($obj, 1);
-                if (trim($obj) == '') {
+                if (trim($obj) === '') {
                     continue;
                 }
-                if ($complete != '+') {
+                if ($complete !== '+') {
                     $complete = '-';
                 }
                 $indent = 0;
-                while ($indent < 2 && substr($obj, $indent, 1) == ' ') {
+                while ($indent < 2 && substr($obj, $indent, 1) === ' ') {
                     $indent++;
                     $objtext .= '<ul>';
                 }
@@ -381,26 +373,14 @@ class block_objectives_class {
             $text .= $groupsmenu;
 
             $startfull = optional_param('lesson_objectives_fullscreen', 0, PARAM_INT);
-            if ($CFG->branch < 33) {
-                $fsicon = $OUTPUT->pix_url('fullscreen_maximize', 'block_objectives');
-            } else {
-                $fsicon = $OUTPUT->image_url('fullscreen_maximize', 'block_objectives');
-            }
+            $fsicon = $OUTPUT->image_url('fullscreen_maximize', 'block_objectives');
 
-            if ($CFG->version < 2012120300) { // < Moodle 2.4.
-                $jsmodule = array(
-                    'name' => 'block_objectives',
-                    'fullpath' => new moodle_url('/blocks/objectives/objectives.js'),
-                    'requires' => array('yui2-yahoo', 'yui2-dom', 'yui2-container', 'yui2-animation')
-                );
-            } else { // Moodle 2.4.
-                $jsmodule = array(
-                    'name' => 'block_objectives',
-                    'fullpath' => new moodle_url('/blocks/objectives/objectives24.js'),
-                    'requires' => array()
-                );
-            }
-            $params = array($fsicon->out(), get_string('fullscreen', 'block_objectives'), $startfull);
+            $jsmodule = [
+                'name' => 'block_objectives',
+                'fullpath' => new moodle_url('/blocks/objectives/objectives24.js'),
+                'requires' => []
+            ];
+            $params = [$fsicon->out(), get_string('fullscreen', 'block_objectives'), $startfull];
             $PAGE->requires->js_init_call('M.block_objectives.init_fullscreen', $params, true, $jsmodule);
         }
 
@@ -495,7 +475,8 @@ class block_objectives_class {
         // Output the week navigation options.
         echo $OUTPUT->box_start();
         echo '<a href="'.$prevlink.'">&lt;&lt;&lt; '.get_string('prevweek', 'block_objectives').'</a> ';
-        echo get_string('weekbegining', 'block_objectives').' <strong>'.userdate($this->ws2ts($weekstart), get_string('strftimedaydate')).'</strong>';
+        echo get_string('weekbegining', 'block_objectives').' <strong>'.
+            userdate($this->ws2ts($weekstart), get_string('strftimedaydate')).'</strong>';
         echo ' <a href="'.$nextlink.'">'.get_string('nextweek', 'block_objectives').' &gt;&gt;&gt;</a>';
         echo $OUTPUT->box_end();
 
@@ -524,14 +505,14 @@ class block_objectives_class {
                 foreach ($objarray as $obj) {
                     $complete = substr($obj, 0, 1);
                     $obj = substr($obj, 1);
-                    if (trim($obj) == '') {
+                    if (trim($obj) === '') {
                         continue;
                     }
-                    if ($complete != '+') {
+                    if ($complete !== '+') {
                         $complete = '-';
                     }
                     $indent = 0;
-                    while ($indent < 2 && substr($obj, $indent, 1) == ' ') {
+                    while ($indent < 2 && substr($obj, $indent, 1) === ' ') {
                         $indent++;
                         $objtext .= '<ul>';
                     }
@@ -572,7 +553,7 @@ class block_objectives_class {
         $courseurl = new moodle_url('/course/view.php', array('id' => $this->course->id));
 
         if (!$canedittimetables && !$caneditobjectives) {
-            error('You do not have permission to change any lesson objective settings');
+            print_error('You do not have permission to change any lesson objective settings');
         }
 
         if (!$caneditobjectives) {
@@ -581,18 +562,18 @@ class block_objectives_class {
         }
 
         // TODO limit to only show objectives for selected group.
-        $timetables = $DB->get_records('block_objectives_timetable', array('objectivesid' => $this->settings->id), 'day, starttime, groupid');
+        $timetables = $DB->get_records('block_objectives_timetable', ['objectivesid' => $this->settings->id],
+                                       'day, starttime, groupid');
         if (empty($timetables)) {
             if ($canedittimetables) {
                 $this->edit_timetables();
                 return;
-            } else {
-                $this->print_header();
-                echo $OUTPUT->box(get_string('notimetables', 'block_objectives'));
-                echo $OUTPUT->continue($courseurl);
-                $this->print_footer();
-                return;
             }
+            $this->print_header();
+            echo $OUTPUT->box(get_string('notimetables', 'block_objectives'));
+            echo $OUTPUT->continue($courseurl);
+            $this->print_footer();
+            return;
         }
 
         $weekstart = $this->getweekstart($weekstart);
@@ -626,7 +607,7 @@ class block_objectives_class {
             redirect($courseurl);
         }
 
-        if (($data = $mform->get_data()) && ($data->action == 'savesettings')) {
+        if (($data = $mform->get_data()) && ($data->action === 'savesettings')) {
             foreach ($data->obj as $timetableid => $obj) {
                 $addnew = true;
                 if ($objectives) {
@@ -644,7 +625,7 @@ class block_objectives_class {
                         }
                     }
                 }
-                if ($addnew && trim($obj) != '') {
+                if ($addnew && trim($obj) !== '') {
                     $new = new stdClass;
                     $new->timetableid = $timetableid;
                     $new->weekstart = $weekstart;
@@ -693,12 +674,12 @@ class block_objectives_class {
             if ($caneditobjectives) {
                 $this->edit_objectives();
                 return;
-            } else {
-                error('You do not have permission to change any lesson objective settings');
             }
+            print_error('You do not have permission to change any lesson objective settings');
         }
 
-        $timetables = $DB->get_records('block_objectives_timetable', array('objectivesid' => $this->settings->id), 'day, starttime, groupid');
+        $timetables = $DB->get_records('block_objectives_timetable', ['objectivesid' => $this->settings->id],
+                                       'day, starttime, groupid');
         $days = array(
             'monday' => array(), 'tuesday' => array(), 'wednesday' => array(),
             'thursday' => array(), 'friday' => array(), 'saturday' => array(),
@@ -715,10 +696,10 @@ class block_objectives_class {
                 $days[$num2day[$lesson->day]][] = $lesson->id; // Store the id to use when creating the form.
                 // Store the settings for this entry.
                 $settings["lgroup[{$lesson->id}]"] = $lesson->groupid;
-                $settings["lstarthour[{$lesson->id}]"] = intval(userdate($lesson->starttime, '%H'));
-                $settings["lstartminute[{$lesson->id}]"] = intval(userdate($lesson->starttime, '%M'));
-                $settings["lendhour[{$lesson->id}]"] = intval(userdate($lesson->endtime, '%H'));
-                $settings["lendminute[{$lesson->id}]"] = intval(userdate($lesson->endtime, '%M'));
+                $settings["lstarthour[{$lesson->id}]"] = (int)(userdate($lesson->starttime, '%H'));
+                $settings["lstartminute[{$lesson->id}]"] = (int)(userdate($lesson->starttime, '%M'));
+                $settings["lendhour[{$lesson->id}]"] = (int)(userdate($lesson->endtime, '%H'));
+                $settings["lendminute[{$lesson->id}]"] = (int)(userdate($lesson->endtime, '%M'));
             }
         }
         $lastnew = 0;
@@ -744,7 +725,7 @@ class block_objectives_class {
             }
         }
 
-        if (($data = $mform->get_data()) && ($data->action == 'savesettings')) {
+        if (($data = $mform->get_data()) && ($data->action === 'savesettings')) {
             foreach ($data->lgroup as $lid => $lgroup) {
                 if ($lid < 0 || !isset($timetables[$lid])) { // New entry.
                     if ($lgroup >= 0) { // Not disabled.
@@ -778,7 +759,7 @@ class block_objectives_class {
                                 $DB->update_record('block_objectives_timetable', $upd);
                             } else {
                                 $this->print_header();
-                                error('Attempting to update record that does not match database');
+                                print_error('Attempting to update record that does not match database');
                             }
                         }
                     }
@@ -801,16 +782,14 @@ class block_objectives_class {
 
     /**
      * Moodle has introduced a change that broke my timestamp code, so I'm reproducing the original code here.
+     * @param $hour
+     * @param $minute
+     * @return false|int
      */
     private function make_timestamp($hour, $minute) {
-        global $CFG;
-        if ($CFG->branch < 29) {
-            $timezone = get_user_timezone_offset(99);
-        } else {
-            $tz = core_date::get_user_timezone();
-            $date = new DateTime('now', new DateTimeZone($tz));
-            $timezone = ($date->getOffset() - dst_offset_on(time(), $tz)) / (3600.0);
-        }
+        $tz = core_date::get_user_timezone();
+        $date = new DateTime('now', new DateTimeZone($tz));
+        $timezone = ($date->getOffset() - dst_offset_on(time(), $tz)) / (3600.0);
 
         if (abs($timezone) > 13) {
             // Server time.
@@ -872,23 +851,26 @@ class block_objectives_timetable_form extends moodleform {
             $mform->addElement('header', $day, get_string($day, 'calendar'));
             foreach ($lessons as $lid) {
                 $lel = array();
-                $lel[] =& $mform->createElement('select', "lgroup[$lid]", get_string('group', 'block_objectives'), $groupnames);
+                $lel[] = $mform->createElement('select', "lgroup[$lid]", get_string('group', 'block_objectives'), $groupnames);
                 $mform->setDefault("lgroup[$lid]", -1);
-                $lel[] =& $mform->createElement('static', null, '', '&nbsp;&nbsp;'.get_string('lessonstart', 'block_objectives'));
-                $lel[] =& $mform->createElement('select', "lstarthour[$lid]", get_string('lessonstarthour', 'block_objectives'), $hours);
+                $lel[] = $mform->createElement('static', null, '', '&nbsp;&nbsp;'.get_string('lessonstart', 'block_objectives'));
+                $lel[] = $mform->createElement('select', "lstarthour[$lid]", get_string('lessonstarthour', 'block_objectives'),
+                                                $hours);
                 $mform->setDefault("lstarthour[$lid]", 8);
                 $mform->disabledIf("lstarthour[$lid]", "lgroup[$lid]", 'eq', -1);
-                $lel[] =& $mform->createElement('select', "lstartminute[$lid]", get_string('lessonstartminute', 'block_objectives'), $minutes);
+                $lel[] = $mform->createElement('select', "lstartminute[$lid]", get_string('lessonstartminute', 'block_objectives'),
+                                               $minutes);
                 $mform->disabledIf("lstartminute[$lid]", "lgroup[$lid]", 'eq', -1);
 
-                $lel[] =& $mform->createElement('static', null, '', '&nbsp;&nbsp;'.get_string('lessonend', 'block_objectives'));
-                $lel[] =& $mform->createElement('select', "lendhour[$lid]", get_string('lessonendhour', 'block_objectives'), $hours);
+                $lel[] = $mform->createElement('static', null, '', '&nbsp;&nbsp;'.get_string('lessonend', 'block_objectives'));
+                $lel[] = $mform->createElement('select', "lendhour[$lid]", get_string('lessonendhour', 'block_objectives'), $hours);
                 $mform->setDefault("lendhour[$lid]", 8);
                 $mform->disabledIf("lendhour[$lid]", "lgroup[$lid]", 'eq', -1);
-                $lel[] =& $mform->createElement('select', "lendminute[$lid]", get_string('lessonstartminute', 'block_objectives'), $minutes);
+                $lel[] = $mform->createElement('select', "lendminute[$lid]", get_string('lessonstartminute', 'block_objectives'),
+                                               $minutes);
                 $mform->disabledIf("lendminute[$lid]", "lgroup[$lid]", 'eq', -1);
 
-                $lel[] =& $mform->createElement('hidden', "lday[$lid]", $weekday);
+                $lel[] = $mform->createElement('hidden', "lday[$lid]", $weekday);
                 $mform->setType("lday[$lid]", PARAM_INT);
 
                 $mform->addGroup($lel, 'lesson'.$lid.'group', get_string('lesson', 'block_objectives'), array(''), false);

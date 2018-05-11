@@ -31,7 +31,7 @@ class block_objectives_edit_form extends block_edit_form {
         $mform->setType('action', PARAM_TEXT);
     }
 
-    function set_data($defaults) {
+    public function set_data($defaults) {
         global $COURSE, $DB;
 
         $obj = new block_objectives_class($COURSE);
@@ -47,7 +47,7 @@ class block_objectives_edit_form extends block_edit_form {
         if (!$this->is_cancelled() && $this->is_submitted() && $this->is_validated()) {
             $mform = $this->_form;
             $data = (object)$mform->exportValues();
-            if ($data->action == 'savesettings') {
+            if ($data->action === 'savesettings') {
                 // Save out the settings I am interested in.
                 $upd = new stdClass;
                 $upd->id = $data->objectivesid;

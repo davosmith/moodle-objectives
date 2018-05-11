@@ -14,23 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * @package blocks
- * @subpackage objectives
- * @copyright 2011 Davo Smith ( davo@davodev.co.uk )
+ * @package block_objectives
+ * @copyright 2011 Davo Smith
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot.'/blocks/objectives/backup/moodle2/backup_objectives_stepslib.php');
 
-/**
- * Specialised backup task for the rss_client block
- * (has own DB structures to backup)
- *
- */
 class backup_objectives_block_task extends backup_block_task {
 
     protected function define_my_settings() {

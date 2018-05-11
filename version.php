@@ -21,4 +21,4 @@ $plugin->cron = 0;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '3.4+ (Build: 2017051200)';
 $plugin->component = 'block_objectives';
-$plugin->requires = 2017111300; // Moodle 3.4+
+$plugin->requires = 2017111300; // Moodle 3.4+.
