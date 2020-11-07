@@ -34,6 +34,6 @@ $PAGE->set_url($url);
 
 require_login($course);
 
-$obj = new block_objectives_class($course);
+$obj = new block_objectives_class($course, $PAGE);
 
 $obj->view_objectives($weekstart);

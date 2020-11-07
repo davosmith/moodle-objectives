@@ -23,8 +23,10 @@ class block_objectives_class {
     public $settings;
     public $context;
     public $course;
+    /** @var moodle_page  */
+    private $page;
 
-    public function __construct($course) {
+    public function __construct($course, moodle_page $page) {
         global $DB;
 
         if (is_int($course)) {
@@ -42,6 +44,7 @@ class block_objectives_class {
         }
 
         $this->context = context_course::instance($course->id);
+        $this->page = $page;
     }
 
     public function get_settings() {
@@ -224,7 +227,7 @@ class block_objectives_class {
     }
 
     public function get_block_text() {
-        global $USER, $DB, $OUTPUT, $PAGE;
+        global $USER, $DB, $OUTPUT;
 
         if (!$this->can_view_objectives()) {
             return null;
@@ -381,7 +384,7 @@ class block_objectives_class {
                 'requires' => []
             ];
             $params = [$fsicon->out(), get_string('fullscreen', 'block_objectives'), $startfull];
-            $PAGE->requires->js_init_call('M.block_objectives.init_fullscreen', $params, true, $jsmodule);
+            $this->page->requires->js_init_call('M.block_objectives.init_fullscreen', $params, true, $jsmodule);
         }
 
         return $text;
@@ -805,12 +808,12 @@ class block_objectives_class {
     }
 
     public function print_header() {
-        global $PAGE, $OUTPUT;
+        global $OUTPUT;
 
         $pagetitle = strip_tags($this->course->shortname.': '.get_string('pluginname', 'block_objectives'));
 
-        $PAGE->set_title($pagetitle);
-        $PAGE->set_heading($this->course->fullname);
+        $this->page->set_title($pagetitle);
+        $this->page->set_heading($this->course->fullname);
 
         echo $OUTPUT->header();
     }

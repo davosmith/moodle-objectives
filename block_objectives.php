@@ -39,7 +39,7 @@ class block_objectives extends block_base {
             return $this->content;
         }
 
-        $obj = new block_objectives_class($COURSE);
+        $obj = new block_objectives_class($COURSE, $this->page);
 
         $this->content = new stdClass;
         $this->content->text = $obj->get_block_text();

@@ -35,7 +35,7 @@ $PAGE->set_url($url);
 
 require_login($course);
 
-$obj = new block_objectives_class($course);
+$obj = new block_objectives_class($course, $PAGE);
 
 if ($viewtab == 'timetables') {
     $obj->edit_timetables();

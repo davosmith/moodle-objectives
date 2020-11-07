@@ -32,9 +32,9 @@ class block_objectives_edit_form extends block_edit_form {
     }
 
     public function set_data($defaults) {
-        global $COURSE, $DB;
+        global $COURSE, $DB, $PAGE;
 
-        $obj = new block_objectives_class($COURSE);
+        $obj = new block_objectives_class($COURSE, $PAGE);
         $settings = $obj->get_settings();
 
         $defaults->objectivesintro = $settings->intro;
