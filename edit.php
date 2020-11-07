@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-global $CFG, $DB, $PAGE;
-require_once($CFG->dirroot.'/blocks/objectives/lib.php');
+global $DB, $PAGE;
 
 $courseid = required_param('course', PARAM_INT);
 $viewtab = optional_param('viewtab', 'objectives', PARAM_TEXT);
@@ -35,7 +34,7 @@ $PAGE->set_url($url);
 
 require_login($course);
 
-$obj = new block_objectives_class($course, $PAGE);
+$obj = new \block_objectives\objectives($course);
 
 if ($viewtab == 'timetables') {
     $obj->edit_timetables();

@@ -16,8 +16,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/lib.php');
-
 class block_objectives extends block_base {
 
     public function init() {
@@ -39,7 +37,7 @@ class block_objectives extends block_base {
             return $this->content;
         }
 
-        $obj = new block_objectives_class($COURSE, $this->page);
+        $obj = new \block_objectives\objectives($COURSE);
 
         $this->content = new stdClass;
         $this->content->text = $obj->get_block_text();

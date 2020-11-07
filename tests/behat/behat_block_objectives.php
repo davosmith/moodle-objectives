@@ -45,11 +45,8 @@ class behat_block_objectives extends behat_base {
      * @param string $datestring
      */
     public function i_force_the_objectives_block_current_time_to($datestring) {
-        global $CFG;
-        require_once($CFG->dirroot.'/blocks/objectives/lib.php');
-
         $timestamp = strtotime($datestring);
-        block_objectives_class::override_current_time($timestamp);
+        \block_objectives\objectives::override_current_time($timestamp);
 
         $this->getSession()->reload();
     }
