@@ -14,8 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Upgrade steps
+ *
+ * @package   block_objectives
+ * @copyright Davo Smith (moodle@davosmith.co.uk)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Upgrade steps
+ * @param int $oldversion
+ * @return bool
+ */
 function xmldb_block_objectives_upgrade($oldversion = 0) {
     global $DB;
 

@@ -14,7 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+/**
+ * View objectives
+ *
+ * @package   block_objectives
+ * @copyright Davo Smith (moodle@davosmith.co.uk)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require_once(__DIR__.'/../../config.php');
 global $DB, $PAGE;
 
 $courseid = required_param('course', PARAM_INT);

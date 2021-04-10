@@ -14,22 +14,52 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Main block class
+ *
+ * @package   block_objectives
+ * @copyright Davo Smith (moodle@davosmith.co.uk)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class block_objectives
+ */
 class block_objectives extends block_base {
 
+    /**
+     * Block initialisation
+     * @throws coding_exception
+     */
     public function init() {
         $this->title = get_string('pluginname', 'block_objectives');
     }
 
+    /**
+     * Where can this block be shown?
+     * @return array
+     */
     public function applicable_formats() {
         return array('all' => false, 'course' => true);
     }
 
+    /**
+     * Preferred block width
+     * @return int
+     */
     public function preferred_width() {
         return 240;
     }
 
+    /**
+     * Get the block content
+     * @return stdClass|stdObject|null
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public function get_content() {
         global $COURSE;
 
@@ -46,6 +76,10 @@ class block_objectives extends block_base {
         return $this->content;
     }
 
+    /**
+     * Is per-instance config allowed?
+     * @return bool
+     */
     public function instance_allow_config() {
         return true;
     }

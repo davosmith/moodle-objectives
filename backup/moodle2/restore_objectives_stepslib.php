@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package blocks
- * @subpackage objectives
+ * Restore objective block instance
+ *
+ * @package block_objectives
  * @copyright 2011 Davo Smith ( davo@davodev.co.uk )
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,6 +33,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class restore_objectives_block_structure_step extends restore_structure_step {
 
+    /**
+     * Define the structure to be restored
+     * @return array
+     */
     protected function define_structure() {
 
         $paths = array();
@@ -44,6 +49,12 @@ class restore_objectives_block_structure_step extends restore_structure_step {
         return $paths;
     }
 
+    /**
+     * Restore an objectives record
+     * @param array|object $data
+     * @throws dml_exception
+     * @throws restore_step_exception
+     */
     public function process_objectives($data) {
         global $DB;
 
@@ -67,6 +78,12 @@ class restore_objectives_block_structure_step extends restore_structure_step {
         $this->set_mapping('objectives', $oldid, $newid);
     }
 
+    /**
+     * Define a timetable record to restore
+     * @param array|object $data
+     * @throws dml_exception
+     * @throws restore_step_exception
+     */
     public function process_objectives_timetable($data) {
         global $DB;
 
@@ -79,6 +96,12 @@ class restore_objectives_block_structure_step extends restore_structure_step {
         $this->set_mapping('objectives_timetable', $oldid, $newid);
     }
 
+    /**
+     * Define an objective record to restore
+     * @param array|object $data
+     * @throws dml_exception
+     * @throws restore_step_exception
+     */
     public function process_objectives_objective($data) {
         global $DB;
 

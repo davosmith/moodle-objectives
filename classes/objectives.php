@@ -32,12 +32,25 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class objectives
+ * @package block_objectives
+ */
 class objectives {
 
+    /** @var stdClass */
     public $settings;
+    /** @var \context */
     public $context;
+    /** @var stdClass */
     public $course;
 
+    /**
+     * objectives constructor.
+     * @param object $course
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public function __construct($course) {
         global $DB;
 
@@ -58,33 +71,65 @@ class objectives {
         $this->context = \context_course::instance($course->id);
     }
 
+    /**
+     * Get the block settings
+     * @return stdClass
+     */
     public function get_settings() {
         return $this->settings;
     }
 
+    /**
+     * Can the current user view the objectives?
+     * @return bool
+     * @throws \coding_exception
+     */
     public function can_view_objectives() {
         return has_capability('block/objectives:viewobjectives', $this->context);
     }
 
+    /**
+     * Can the current user edit objectives?
+     * @return bool
+     * @throws \coding_exception
+     */
     public function can_edit_objectives() {
         return has_capability('block/objectives:editobjectives', $this->context);
     }
 
+    /**
+     * Can the current user edit timetables?
+     * @return bool
+     * @throws \coding_exception
+     */
     public function can_edit_timetables() {
         return has_capability('block/objectives:edittimetables', $this->context);
     }
 
+    /**
+     * Can the current user check-off objectives?
+     * @return bool
+     * @throws \coding_exception
+     */
     public function can_checkoff_objectives() {
         return has_capability('block/objectives:checkoffobjectives', $this->context);
     }
 
-    // Convert weekstart into a timestamp (noon on that day).
+    /**
+     * Convert weekstart into a timestamp (noon on that day).
+     * @param string $weekstart
+     * @return false|int
+     */
     public function ws2ts($weekstart) {
         return mktime(12, 0, 0, (int)(substr($weekstart, 4, 2)), (int)(substr($weekstart, 6, 2)),
                       (int)(substr($weekstart, 0, 4)));
     }
 
-    // Convert a timestamp into 'YYYYMMDD' for that day.
+    /**
+     * Convert a timestamp into 'YYYYMMDD' for that day.
+     * @param int $timestamp
+     * @return string
+     */
     public function ts2ws($timestamp) {
         return date('Ymd', $timestamp);
     }
@@ -126,7 +171,11 @@ class objectives {
         return $CFG->block_objectives_time_override;
     }
 
-    // Get string representing start of week in YYYYMMDD format.
+    /**
+     * Get string representing start of week in YYYYMMDD format.
+     * @param string|null $weekstart
+     * @return string
+     */
     public function getweekstart($weekstart = null) {
         if ($weekstart && strlen($weekstart) === 8) {
             $ts = $this->ws2ts($weekstart);
@@ -146,6 +195,12 @@ class objectives {
         return $this->ts2ws($weekstartts); // Convert to string YYYYMMDD.
     }
 
+    /**
+     * Add a number of weeks to the start point
+     * @param string $weekstart
+     * @param int $offset
+     * @return string
+     */
     public function addweek($weekstart, $offset) {
         // Work out timestamp for noon on specified day.
         $ts = $this->ws2ts($weekstart);
@@ -153,6 +208,11 @@ class objectives {
         return $this->ts2ws($ts); // Convert to string YYYYMMDD.
     }
 
+    /**
+     * Get the day of the week from the timestamp
+     * @param int $timestamp
+     * @return int
+     */
     public function getweekday($timestamp = 0) {
         if ($timestamp) {
             $dateinfo = getdate($timestamp);
@@ -162,7 +222,11 @@ class objectives {
         return ($dateinfo['wday'] + 6) % 7; // I have Monday as day 0.
     }
 
-    // Seconds since the start of today.
+    /**
+     * Seconds since the start of today.
+     * @param int $timestamp
+     * @return int
+     */
     public function gettimenow($timestamp = 0) {
         if ($timestamp) {
             $dateinfo = getdate($timestamp);
@@ -174,7 +238,12 @@ class objectives {
         return $timenow;
     }
 
-    // Select the objectives that match the selected group (or select a new one if no suitable objectives).
+    /**
+     * Select the objectives that match the selected group (or select a new one if no suitable objectives).
+     * @param object[] $objectives
+     * @return false|stdClass
+     * @throws \coding_exception
+     */
     public function objectives_for_selected_group($objectives) {
         global $SESSION;
 
@@ -217,6 +286,14 @@ class objectives {
         return reset($objectives);  // Should not reach here, but just in case...
     }
 
+    /**
+     * Group select menu
+     * @param stdClass[] $objectives
+     * @param stdClass[] $groups
+     * @return string
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
     public function groups_menu($objectives, $groups) {
         global $OUTPUT;
 
@@ -237,6 +314,13 @@ class objectives {
             $OUTPUT->single_select($baseurl, 'objectives_group', $groupsmenu, $selected->groupid).'</span>';
     }
 
+    /**
+     * Get the text for the block
+     * @return string|null
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
     public function get_block_text() {
         global $USER, $DB, $OUTPUT, $PAGE;
 
@@ -401,6 +485,12 @@ class objectives {
         return $text;
     }
 
+    /**
+     * Log the objective check-off status change
+     * @param int $objectivesid
+     * @param bool $completed
+     * @throws \coding_exception
+     */
     protected function log_update($objectivesid, $completed) {
         global $CFG;
         if ($CFG->version > 2014051200) { // Moodle 2.7+.
@@ -414,6 +504,12 @@ class objectives {
         }
     }
 
+    /**
+     * Get the content of the block footer
+     * @return string
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
     public function get_block_footer() {
         $edittext = '';
         if ($this->can_edit_timetables() || $this->can_edit_objectives()) {
@@ -424,6 +520,13 @@ class objectives {
         return $edittext.'<a href="'.$viewlink.'">'.get_string('viewobjectives', 'block_objectives').' &hellip;</a>';
     }
 
+    /**
+     * View the objectives for the given week (or this week)
+     * @param string|null $weekstart
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
     public function view_objectives($weekstart = null) {
         global $USER, $DB, $OUTPUT;
 
@@ -552,14 +655,31 @@ class objectives {
         $this->print_footer();
     }
 
+    /**
+     * Uncheck an objective
+     * @param string $obj
+     * @return string
+     */
     public function remove_checkedoff($obj) {
         return preg_replace(array('/^\+/m', '/^-/m'), '', $obj);
     }
 
+    /**
+     * Mark objective as not cheked-off
+     * @param string $obj
+     * @return string|string[]|null
+     */
     public function add_not_checkedoff($obj) {
         return preg_replace('/^(.)/m', '-$1', $obj); // Start each line with '-' (incomplete).
     }
 
+    /**
+     * Objectives editing interface
+     * @param string|null $weekstart
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
     public function edit_objectives($weekstart = null) {
         global $DB, $OUTPUT;
         $caneditobjectives = $this->can_edit_objectives();
@@ -677,6 +797,12 @@ class objectives {
         $this->print_footer();
     }
 
+    /**
+     * Timetables editing interface
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
     public function edit_timetables() {
         global $DB, $OUTPUT;
 
@@ -796,8 +922,8 @@ class objectives {
 
     /**
      * Moodle has introduced a change that broke my timestamp code, so I'm reproducing the original code here.
-     * @param $hour
-     * @param $minute
+     * @param int $hour
+     * @param int $minute
      * @return false|int
      */
     private function make_timestamp($hour, $minute) {
@@ -818,6 +944,10 @@ class objectives {
         return $time;
     }
 
+    /**
+     * Output the page header
+     * @throws \coding_exception
+     */
     public function print_header() {
         global $OUTPUT, $PAGE;
 
@@ -829,6 +959,9 @@ class objectives {
         echo $OUTPUT->header();
     }
 
+    /**
+     * Output the page footer
+     */
     public function print_footer() {
         global $OUTPUT;
         echo $OUTPUT->footer();

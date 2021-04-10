@@ -128,6 +128,11 @@ class behat_block_objectives extends behat_base {
         }
     }
 
+    /**
+     * Convert time string to timestamp for use in the timetable
+     * @param string $time
+     * @return int
+     */
     private function timestring_to_timetable_timestamp($time) {
         $timestamp = strtotime($time);
         $dateinfo = getdate($timestamp);

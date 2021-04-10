@@ -14,9 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Edit instance form
+ *
+ * @package   block_objectives
+ * @copyright Davo Smith (moodle@davosmith.co.uk)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class block_objectives_edit_form
+ */
 class block_objectives_edit_form extends block_edit_form {
+    /**
+     * Instance settings specific to objectives block
+     * @param object $mform
+     * @throws coding_exception
+     */
     protected function specific_definition($mform) {
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
@@ -31,6 +47,11 @@ class block_objectives_edit_form extends block_edit_form {
         $mform->setType('action', PARAM_TEXT);
     }
 
+    /**
+     * Override the sending of data to the form
+     * @param array|stdClass $defaults
+     * @throws dml_exception
+     */
     public function set_data($defaults) {
         global $COURSE, $DB;
 

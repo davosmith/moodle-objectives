@@ -30,7 +30,15 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/formslib.php');
 
+/**
+ * Class objectives_form
+ * @package block_objectives
+ */
 class objectives_form extends moodleform {
+    /**
+     * Define the form elements
+     * @throws \coding_exception
+     */
     protected function definition() {
         $mform = $this->_form;
         $custom = $this->_customdata;

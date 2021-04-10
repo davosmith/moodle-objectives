@@ -81,6 +81,10 @@ class objective_updated extends \core\event\base {
         ));
     }
 
+    /**
+     * Validate the event data
+     * @throws \coding_exception
+     */
     protected function validate_data() {
         if (!isset($this->other['completed'])) {
             throw new \coding_exception("Must specify '\$other['completed']' - whether the objective ".

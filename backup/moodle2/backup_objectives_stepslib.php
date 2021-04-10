@@ -14,14 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * @package blocks
- * @subpackage objectives
+ * Backup objective block instance
+ *
+ * @package block_objectives
  * @copyright 2011 Davo Smith ( davo@davodev.co.uk )
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define all the backup steps that wll be used by the backup_objectives_block_task
@@ -32,6 +33,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 class backup_objectives_block_structure_step extends backup_block_structure_step {
 
+    /**
+     * Define the structure to be backed up
+     * @return backup_nested_element
+     * @throws base_element_struct_exception
+     */
     protected function define_structure() {
         // Define each element separated.
         $objectives = new backup_nested_element('objectives', array('id'), array('intro'));
