@@ -12,6 +12,7 @@ Other features include:
 
 ==Recent changes==
 
+2021-05-15 - Minor M3.11 compatibility fixes
 2021-04-10 - Minor internal documentation changes and switch from Travis to Github actions
 2018-04-21 - Add GDPR declaration (no personal data stored). This requires M3.4 to work.
 2017-05-12 - M3.3 compatibility fixes

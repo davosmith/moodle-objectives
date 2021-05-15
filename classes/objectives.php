@@ -687,7 +687,7 @@ class objectives {
         $courseurl = new \moodle_url('/course/view.php', array('id' => $this->course->id));
 
         if (!$canedittimetables && !$caneditobjectives) {
-            print_error('You do not have permission to change any lesson objective settings');
+            throw new \moodle_exception('You do not have permission to change any lesson objective settings');
         }
 
         if (!$caneditobjectives) {
@@ -815,7 +815,7 @@ class objectives {
                 $this->edit_objectives();
                 return;
             }
-            print_error('You do not have permission to change any lesson objective settings');
+            throw new \moodle_exception('You do not have permission to change any lesson objective settings');
         }
 
         $timetables = $DB->get_records('block_objectives_timetable', ['objectivesid' => $this->settings->id],
@@ -899,7 +899,7 @@ class objectives {
                                 $DB->update_record('block_objectives_timetable', $upd);
                             } else {
                                 $this->print_header();
-                                print_error('Attempting to update record that does not match database');
+                                throw new \moodle_exception('Attempting to update record that does not match database');
                             }
                         }
                     }

@@ -66,7 +66,7 @@ class restore_objectives_block_task extends restore_block_task {
      * Decode the block content
      * @return array
      */
-    static public function define_decode_contents() {
+    public static function define_decode_contents() {
         return array();
     }
 
@@ -74,7 +74,7 @@ class restore_objectives_block_task extends restore_block_task {
      * Define any decode rules for the content
      * @return array
      */
-    static public function define_decode_rules() {
+    public static function define_decode_rules() {
         return array();
     }
 }

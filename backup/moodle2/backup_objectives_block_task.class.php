@@ -67,7 +67,7 @@ class backup_objectives_block_task extends backup_block_task {
      * Encode links in the content
      * @param mixed $content
      */
-    static public function encode_content_links($content) {
+    public static function encode_content_links($content) {
         return $content; // No special encoding of links.
     }
 }
