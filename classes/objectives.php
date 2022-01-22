@@ -30,8 +30,6 @@ use DateTimeZone;
 use moodle_url;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class objectives
  * @package block_objectives

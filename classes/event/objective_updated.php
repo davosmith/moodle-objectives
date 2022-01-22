@@ -24,8 +24,6 @@
 
 namespace block_objectives\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The block_objectives objective updated class.
  *

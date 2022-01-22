@@ -24,8 +24,6 @@
 
 namespace block_objectives\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class provider
  * @package block_objectives
