@@ -20,7 +20,7 @@
 
 .lesson_objectives_list img {
     width: 1em;
-    height: 1em;
+    height: inherit;
 }
 
 .lesson_objectives_groupsmenu div {
@@ -39,7 +39,7 @@
 
 .lesson_objectives_fullscreen_area img {
     width: 1em;
-    height: 1em;
+    height: inherit;
 }
 
 .lesson_objectives_table td {
