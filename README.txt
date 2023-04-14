@@ -12,7 +12,7 @@ Other features include:
 
 ==Recent changes==
 
-2023-04-14 - Minor M4.2 compatibility fixes, small layout fix for tick boxes
+2023-04-14 - 3.4.1.0 - Minor M4.2 compatibility fixes, small layout fix for tick boxes
 2022-11-19 - Minor M4.1 compatibility fixes
 2022-01-22 - Minor M4.0 compatibility fixes
 2021-05-15 - Minor M3.11 compatibility fixes
