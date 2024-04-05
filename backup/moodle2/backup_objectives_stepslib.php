@@ -38,15 +38,15 @@ class backup_objectives_block_structure_step extends backup_block_structure_step
      */
     protected function define_structure() {
         // Define each element separated.
-        $objectives = new backup_nested_element('objectives', array('id'), array('intro'));
+        $objectives = new backup_nested_element('objectives', ['id'], ['intro']);
 
         $objectivestimetables = new backup_nested_element('objectives_timetables');
-        $objectivestimetable = new backup_nested_element('objectives_timetable', array('id'), array(
-            'groupid', 'day', 'starttime', 'endtime'
-        ));
+        $objectivestimetable = new backup_nested_element('objectives_timetable', ['id'], [
+            'groupid', 'day', 'starttime', 'endtime',
+        ]);
 
         $objectivesobjectives = new backup_nested_element('objectives_objectives');
-        $objectivesobjective = new backup_nested_element('objectives_objective', array('id'), array('weekstart', 'objectives'));
+        $objectivesobjective = new backup_nested_element('objectives_objective', ['id'], ['weekstart', 'objectives']);
 
         // Build the tree.
 
@@ -57,9 +57,9 @@ class backup_objectives_block_structure_step extends backup_block_structure_step
 
         // Define sources.
 
-        $objectives->set_source_table('block_objectives', array('course' => backup::VAR_COURSEID));
-        $objectivestimetable->set_source_table('block_objectives_timetable', array('objectivesid' => backup::VAR_PARENTID));
-        $objectivesobjective->set_source_table('block_objectives_objectives', array('timetableid' => backup::VAR_PARENTID));
+        $objectives->set_source_table('block_objectives', ['course' => backup::VAR_COURSEID]);
+        $objectivestimetable->set_source_table('block_objectives_timetable', ['objectivesid' => backup::VAR_PARENTID]);
+        $objectivesobjective->set_source_table('block_objectives_objectives', ['timetableid' => backup::VAR_PARENTID]);
 
         // ID annotations.
         $objectivestimetable->annotate_ids('groups', 'groupid');

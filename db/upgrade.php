@@ -50,7 +50,7 @@ function xmldb_block_objectives_upgrade($oldversion = 0) {
         }
 
         // Drop the old 'weekstart' index.
-        $index = new xmldb_index('weekstart', XMLDB_INDEX_NOTUNIQUE, array('timetableid', 'weekstart'));
+        $index = new xmldb_index('weekstart', XMLDB_INDEX_NOTUNIQUE, ['timetableid', 'weekstart']);
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
         }
@@ -66,7 +66,7 @@ function xmldb_block_objectives_upgrade($oldversion = 0) {
         $dbman->rename_field($table, $field, 'weekstart');
 
         // Add index for 'weekstart' field.
-        $index = new xmldb_index('weekstart', XMLDB_INDEX_NOTUNIQUE, array('timetableid', 'weekstart'));
+        $index = new xmldb_index('weekstart', XMLDB_INDEX_NOTUNIQUE, ['timetableid', 'weekstart']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }

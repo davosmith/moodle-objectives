@@ -61,17 +61,17 @@ class behat_block_objectives extends behat_base {
     public function the_following_objectives_timetable_exists_in_course($coursename, TableNode $table) {
         global $DB;
 
-        $required = array(
+        $required = [
             'day',
             'starttime',
             'endtime',
-        );
-        $optional = array(
-            'group' => ''
-        );
+        ];
+        $optional = [
+            'group' => '',
+        ];
 
         // Valid settings for 'day'.
-        $validdays = array(
+        $validdays = [
             'Monday' => 0,
             'Tuesday' => 1,
             'Wednesday' => 2,
@@ -79,7 +79,7 @@ class behat_block_objectives extends behat_base {
             'Friday' => 4,
             'Saturday' => 5,
             'Sunday' => 6,
-        );
+        ];
 
         $data = $table->getHash();
         $firstrow = reset($data);
@@ -96,9 +96,9 @@ class behat_block_objectives extends behat_base {
             }
         }
 
-        $course = $DB->get_record('course', array('shortname' => $coursename), 'id', MUST_EXIST);
-        $objectives = $DB->get_record('block_objectives', array('course' => $course->id), 'id', MUST_EXIST);
-        $groups = $DB->get_records('groups', array('courseid' => $course->id), '', 'idnumber, id');
+        $course = $DB->get_record('course', ['shortname' => $coursename], 'id', MUST_EXIST);
+        $objectives = $DB->get_record('block_objectives', ['course' => $course->id], 'id', MUST_EXIST);
+        $groups = $DB->get_records('groups', ['courseid' => $course->id], '', 'idnumber, id');
 
         foreach ($data as $row) {
             $groupid = 0;
@@ -117,13 +117,13 @@ class behat_block_objectives extends behat_base {
             $starttime = $this->timestring_to_timetable_timestamp($row['starttime']);
             $endtime = $this->timestring_to_timetable_timestamp($row['endtime']);
 
-            $ins = (object)array(
+            $ins = (object)[
                 'objectivesid' => $objectives->id,
                 'groupid' => $groupid,
                 'day' => $day,
                 'starttime' => $starttime,
                 'endtime' => $endtime,
-            );
+            ];
             $DB->insert_record('block_objectives_timetable', $ins);
         }
     }
@@ -150,15 +150,15 @@ class behat_block_objectives extends behat_base {
     public function the_following_objectives_exist_in_course($coursename, TableNode $table) {
         global $DB;
 
-        $required = array(
+        $required = [
             'weekstart', // A string representing the start of the week YYYYMMDD.
             'day',
             'starttime',
             'objectives', // Comma-separated.
-        );
+        ];
 
         // Valid settings for 'day'.
-        $validdays = array(
+        $validdays = [
             'Monday' => 0,
             'Tuesday' => 1,
             'Wednesday' => 2,
@@ -166,7 +166,7 @@ class behat_block_objectives extends behat_base {
             'Friday' => 4,
             'Saturday' => 5,
             'Sunday' => 6,
-        );
+        ];
 
         $data = $table->getHash();
         $firstrow = reset($data);
@@ -178,8 +178,8 @@ class behat_block_objectives extends behat_base {
             }
         }
 
-        $course = $DB->get_record('course', array('shortname' => $coursename), 'id', MUST_EXIST);
-        $objectives = $DB->get_record('block_objectives', array('course' => $course->id), 'id', MUST_EXIST);
+        $course = $DB->get_record('course', ['shortname' => $coursename], 'id', MUST_EXIST);
+        $objectives = $DB->get_record('block_objectives', ['course' => $course->id], 'id', MUST_EXIST);
 
         foreach ($data as $row) {
             $weekstart = $row['weekstart'];
@@ -192,11 +192,11 @@ class behat_block_objectives extends behat_base {
             }
             $day = $validdays[$dayname];
             $starttime = $this->timestring_to_timetable_timestamp($row['starttime']);
-            $params = array(
+            $params = [
                 'objectivesid' => $objectives->id,
                 'day' => $day,
                 'starttime' => $starttime,
-            );
+            ];
             $timetable = $DB->get_record('block_objectives_timetable', $params, 'id', MUST_EXIST);
             $obj = explode(',', $row['objectives']);
             $obj = array_map(function ($obj) {
@@ -204,11 +204,11 @@ class behat_block_objectives extends behat_base {
             }, $obj);
             $obj = implode("\n", $obj);
 
-            $ins = (object)array(
+            $ins = (object)[
                 'timetableid' => $timetable->id,
                 'weekstart' => $weekstart,
                 'objectives' => $obj,
-            );
+            ];
             $DB->insert_record('block_objectives_objectives', $ins);
         }
     }

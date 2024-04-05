@@ -17,16 +17,16 @@
 /*global document*/
 M.block_objectives = {panel: null};
 
-M.block_objectives.show_fullscreen = function() {
+M.block_objectives.show_fullscreen = function () {
     "use strict";
     this.panel.cfg.setProperty('visible', true);
 };
 
-M.block_objectives.init_fullscreen = function(Y, icon, alt, startfull) {
+M.block_objectives.init_fullscreen = function (Y, icon, alt, startfull) {
     "use strict";
     var self;
     self = this;
-    Y.use('yui2-yahoo', 'yui2-dom', 'yui2-container', 'yui2-animation', function(Y) {
+    Y.use('yui2-yahoo', 'yui2-dom', 'yui2-container', 'yui2-animation', function (Y) {
         var el, vis, content, YAHOO = Y.YUI2;
         el = document.getElementById('lesson_objectives_fullscreen_icon');
         if (el) {
@@ -34,7 +34,7 @@ M.block_objectives.init_fullscreen = function(Y, icon, alt, startfull) {
                 '"><img src="' + icon + '" alt="' + alt + '" /></a>';
         }
 
-        vis = startfull>0;
+        vis = startfull > 0;
 
         self.panel = new YAHOO.widget.Panel('lesson_objectives_fullscreen', {
             width: "800px",

@@ -28,12 +28,12 @@ global $DB, $PAGE;
 $courseid = required_param('course', PARAM_INT);
 $weekstart = optional_param('weekstart', null, PARAM_TEXT);
 
-$course = $DB->get_record('course', array('id' => $courseid));
+$course = $DB->get_record('course', ['id' => $courseid]);
 if (!$course) {
     throw new moodle_exception('Invalid courseid');
 }
 
-$url = new moodle_url('/blocks/objectives/view.php', array('course' => $course->id));
+$url = new moodle_url('/blocks/objectives/view.php', ['course' => $course->id]);
 if ($weekstart != 0) {
     $url->param('weekstart', $weekstart);
 }

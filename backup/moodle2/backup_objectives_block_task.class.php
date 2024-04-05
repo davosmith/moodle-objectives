@@ -52,7 +52,7 @@ class backup_objectives_block_task extends backup_block_task {
      * @return array
      */
     public function get_fileareas() {
-        return array(); // No associated fileareas.
+        return []; // No associated fileareas.
     }
 
     /**
@@ -60,7 +60,7 @@ class backup_objectives_block_task extends backup_block_task {
      * @return array
      */
     public function get_configdata_encoded_attributes() {
-        return array(); // No special handling of configdata.
+        return []; // No special handling of configdata.
     }
 
     /**

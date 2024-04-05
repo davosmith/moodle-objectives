@@ -45,7 +45,7 @@ class objectives_form extends moodleform {
         $timetables = $custom['timetables'];
         $course = $custom['course'];
         $groups = groups_get_all_groups($course->id, 0, 0, 'g.id, g.name');
-        $num2day = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
+        $num2day = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
         $lastday = -1;
         foreach ($timetables as $lesson) {
@@ -59,7 +59,7 @@ class objectives_form extends moodleform {
             if ($lesson->groupid > 0) {
                 $objlabel .= ' ('.$groups[$lesson->groupid]->name.')';
             }
-            $mform->addElement('textarea', "obj[{$lesson->id}]", $objlabel, array('cols' => 40, 'rows' => 5));
+            $mform->addElement('textarea', "obj[{$lesson->id}]", $objlabel, ['cols' => 40, 'rows' => 5]);
         }
 
         $mform->addElement('hidden', 'course', $course->id);
@@ -71,11 +71,11 @@ class objectives_form extends moodleform {
         $mform->addElement('hidden', 'action', 'savesettings');
         $mform->setType('action', PARAM_TEXT);
 
-        $buttons = array();
+        $buttons = [];
         $buttons[] =& $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         $buttons[] =& $mform->createElement('submit', 'saveandcourse', get_string('saveandcourse', 'block_objectives'));
         $buttons[] =& $mform->createElement('cancel');
-        $mform->addGroup($buttons, 'actionbuttons', '', array(' '), false);
+        $mform->addGroup($buttons, 'actionbuttons', '', [' '], false);
         $mform->closeHeaderBefore('actionbuttons');
     }
 }

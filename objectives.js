@@ -25,7 +25,7 @@ M.block_objectives.init_fullscreen = function (Y, icon, alt, startfull) {
         el.innerHTML = '<a href="#" onclick="M.block_objectives.show_fullscreen()"><img src="' + icon + '" alt="' + alt + '" /></a>';
     }
     var vis = false;
-    if (startfull>0) {
+    if (startfull > 0) {
         vis = true;
     }
 

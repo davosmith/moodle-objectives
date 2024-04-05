@@ -40,7 +40,7 @@ class block_objectives extends block_base {
      * @return array
      */
     public function applicable_formats() {
-        return array('all' => false, 'course' => true);
+        return ['all' => false, 'course' => true];
     }
 
     /**

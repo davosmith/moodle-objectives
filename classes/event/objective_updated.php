@@ -73,10 +73,10 @@ class objective_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/checklist/report.php', array(
+        return new \moodle_url('/mod/checklist/report.php', [
             'id' => $this->contextinstanceid,
-            'studentid' => $this->userid
-        ));
+            'studentid' => $this->userid,
+        ]);
     }
 
     /**

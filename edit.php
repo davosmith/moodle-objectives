@@ -29,12 +29,12 @@ $courseid = required_param('course', PARAM_INT);
 $viewtab = optional_param('viewtab', 'objectives', PARAM_TEXT);
 $weekstart = optional_param('weekstart', null, PARAM_TEXT);
 
-$course = $DB->get_record('course', array('id' => $courseid));
+$course = $DB->get_record('course', ['id' => $courseid]);
 if (!$course) {
     throw new moodle_exception('Invalid courseid');
 }
 
-$url = new moodle_url('/blocks/objectives/edit.php', array('course' => $course->id, 'viewtab' => $viewtab));
+$url = new moodle_url('/blocks/objectives/edit.php', ['course' => $course->id, 'viewtab' => $viewtab]);
 if ($weekstart != 0) {
     $url->param('weekstart', $weekstart);
 }
