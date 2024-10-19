@@ -12,6 +12,7 @@ Other features include:
 
 ==Recent changes==
 
+2024-10-19 - 3.4.2.2 - Minor M4.5 compatibility fixes
 2024-04-05 - 3.4.2.1 - Minor M4.4 compatibility fixes
 2023-10-02 - 3.4.2.0 - update GitHub actions ready for 4.3 release
 2023-04-14 - 3.4.1.0 - Minor M4.2 compatibility fixes, small layout fix for tick boxes
