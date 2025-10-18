@@ -43,7 +43,7 @@ function xmldb_block_objectives_upgrade($oldversion = 0) {
         // Convert all existing 'weekstart' values into string representation.
         $objs = $DB->get_records_select('objectives_objectives', 'weekstart > 0');
         foreach ($objs as $obj) {
-            $newobj = new stdClass;
+            $newobj = new stdClass();
             $newobj->id = $obj->id;
             $newobj->weekstartstr = date('Ymd', $obj->weekstart);
             $DB->update_record('objectives_objectives', $newobj);
@@ -84,7 +84,7 @@ function xmldb_block_objectives_upgrade($oldversion = 0) {
             $endhour = (int)($lesson->endtime / (60 * 60));
             $endmin = (int)($lesson->endtime / 60) % 60;
 
-            $updlesson = new stdClass;
+            $updlesson = new stdClass();
             $updlesson->id = $lesson->id;
             $updlesson->starttime = make_timestamp(0, 0, 0, $starthour, $startmin, 0);
             $updlesson->endtime = make_timestamp(0, 0, 0, $endhour, $endmin, 0);

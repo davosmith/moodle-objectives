@@ -33,7 +33,6 @@ namespace block_objectives\event;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class objective_updated extends \core\event\base {
-
     /**
      * Init method.
      *
@@ -85,7 +84,7 @@ class objective_updated extends \core\event\base {
      */
     protected function validate_data() {
         if (!isset($this->other['completed'])) {
-            throw new \coding_exception("Must specify '\$other['completed']' - whether the objective ".
+            throw new \coding_exception("Must specify '\$other['completed']' - whether the objective " .
                                         "was marked as completed or not");
         }
     }

@@ -28,7 +28,7 @@ use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Class timetable_form
@@ -68,36 +68,61 @@ class timetable_form extends moodleform {
             $mform->addElement('header', $day, get_string($day, 'calendar'));
             foreach ($lessons as $lid) {
                 $lel = [];
-                $lel[] = $mform->createElement('select', "lgroup[$lid]", get_string('group', 'block_objectives'),
-                                               $groupnames);
+                $lel[] = $mform->createElement(
+                    'select',
+                    "lgroup[$lid]",
+                    get_string('group', 'block_objectives'),
+                    $groupnames
+                );
                 $mform->setDefault("lgroup[$lid]", -1);
-                $lel[] = $mform->createElement('static', null, '',
-                                               '&nbsp;&nbsp;'.get_string('lessonstart', 'block_objectives'));
-                $lel[] = $mform->createElement('select', "lstarthour[$lid]",
-                                               get_string('lessonstarthour', 'block_objectives'),
-                                               $hours);
+                $lel[] = $mform->createElement(
+                    'static',
+                    null,
+                    '',
+                    '&nbsp;&nbsp;' . get_string('lessonstart', 'block_objectives')
+                );
+                $lel[] = $mform->createElement(
+                    'select',
+                    "lstarthour[$lid]",
+                    get_string('lessonstarthour', 'block_objectives'),
+                    $hours
+                );
                 $mform->setDefault("lstarthour[$lid]", 8);
                 $mform->disabledIf("lstarthour[$lid]", "lgroup[$lid]", 'eq', -1);
-                $lel[] = $mform->createElement('select', "lstartminute[$lid]",
-                                               get_string('lessonstartminute', 'block_objectives'),
-                                               $minutes);
+                $lel[] = $mform->createElement(
+                    'select',
+                    "lstartminute[$lid]",
+                    get_string('lessonstartminute', 'block_objectives'),
+                    $minutes
+                );
                 $mform->disabledIf("lstartminute[$lid]", "lgroup[$lid]", 'eq', -1);
 
-                $lel[] = $mform->createElement('static', null, '',
-                                               '&nbsp;&nbsp;'.get_string('lessonend', 'block_objectives'));
-                $lel[] = $mform->createElement('select', "lendhour[$lid]",
-                                               get_string('lessonendhour', 'block_objectives'), $hours);
+                $lel[] = $mform->createElement(
+                    'static',
+                    null,
+                    '',
+                    '&nbsp;&nbsp;' . get_string('lessonend', 'block_objectives')
+                );
+                $lel[] = $mform->createElement(
+                    'select',
+                    "lendhour[$lid]",
+                    get_string('lessonendhour', 'block_objectives'),
+                    $hours
+                );
                 $mform->setDefault("lendhour[$lid]", 8);
                 $mform->disabledIf("lendhour[$lid]", "lgroup[$lid]", 'eq', -1);
-                $lel[] = $mform->createElement('select', "lendminute[$lid]",
-                                               get_string('lessonstartminute', 'block_objectives'),
-                                               $minutes);
+                $lel[] = $mform->createElement(
+                    'select',
+                    "lendminute[$lid]",
+                    get_string('lessonstartminute', 'block_objectives'),
+                    $minutes
+                );
                 $mform->disabledIf("lendminute[$lid]", "lgroup[$lid]", 'eq', -1);
 
                 $lel[] = $mform->createElement('hidden', "lday[$lid]", $weekday);
                 $mform->setType("lday[$lid]", PARAM_INT);
 
-                $mform->addGroup($lel, 'lesson'.$lid.'group', get_string('lesson', 'block_objectives'), [''], false);
+                $mform->addGroup($lel, 'lesson' . $lid . 'group', get_string('lesson', 'block_objectives'), [''], false);
             }
             $weekday++;
         }
@@ -113,8 +138,11 @@ class timetable_form extends moodleform {
 
         $buttons = [];
         $buttons[] = $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
-        $buttons[] = $mform->createElement('submit', 'saveandobjectives',
-                                           get_string('saveandobjectives', 'block_objectives'));
+        $buttons[] = $mform->createElement(
+            'submit',
+            'saveandobjectives',
+            get_string('saveandobjectives', 'block_objectives')
+        );
         $buttons[] = $mform->createElement('cancel');
         $mform->addGroup($buttons, 'actionbuttons', '', [' '], false);
         $mform->closeHeaderBefore('actionbuttons');

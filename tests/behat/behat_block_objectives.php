@@ -26,7 +26,7 @@
 
 use Behat\Gherkin\Node\TableNode;
 
-require_once(__DIR__.'/../../../../lib/behat/behat_base.php');
+require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 /**
  * Steps definitions related to the objectives block.
@@ -36,7 +36,6 @@ require_once(__DIR__.'/../../../../lib/behat/behat_base.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_block_objectives extends behat_base {
-
     /**
      * Override the objectives block current time - this is a global setting, affecting all users.
      * The page is also reloaded (to make sure the change appears immediately).
@@ -87,12 +86,12 @@ class behat_block_objectives extends behat_base {
         // Check required fields are present.
         foreach ($required as $reqname) {
             if (!isset($firstrow[$reqname])) {
-                throw new Exception('Objectives timetables require the field '.$reqname.' to be set');
+                throw new Exception('Objectives timetables require the field ' . $reqname . ' to be set');
             }
         }
         foreach ($firstrow as $fieldname => $unused) {
             if (!in_array($fieldname, $required) && !array_key_exists($fieldname, $optional)) {
-                throw new Exception('Objectives timetable unknown field '.$fieldname);
+                throw new Exception('Objectives timetable unknown field ' . $fieldname);
             }
         }
 
@@ -105,13 +104,13 @@ class behat_block_objectives extends behat_base {
             if (!empty($row['group'])) {
                 $groupidnumber = $row['group'];
                 if (!isset($groups[$groupidnumber])) {
-                    throw new Exception('Group with idnumber '.$groupidnumber.' not found');
+                    throw new Exception('Group with idnumber ' . $groupidnumber . ' not found');
                 }
                 $groupid = $groups[$groupidnumber]->id;
             }
             $dayname = $row['day'];
             if (!isset($validdays[$dayname])) {
-                throw new Exception('Unknown week day '.$dayname);
+                throw new Exception('Unknown week day ' . $dayname);
             }
             $day = $validdays[$dayname];
             $starttime = $this->timestring_to_timetable_timestamp($row['starttime']);
@@ -174,7 +173,7 @@ class behat_block_objectives extends behat_base {
         // Check required fields are present.
         foreach ($required as $reqname) {
             if (!isset($firstrow[$reqname])) {
-                throw new Exception('Objectives require the field '.$reqname.' to be set');
+                throw new Exception('Objectives require the field ' . $reqname . ' to be set');
             }
         }
 
@@ -188,7 +187,7 @@ class behat_block_objectives extends behat_base {
             }
             $dayname = $row['day'];
             if (!isset($validdays[$dayname])) {
-                throw new Exception('Unknown week day '.$dayname);
+                throw new Exception('Unknown week day ' . $dayname);
             }
             $day = $validdays[$dayname];
             $starttime = $this->timestring_to_timetable_timestamp($row['starttime']);
@@ -200,7 +199,7 @@ class behat_block_objectives extends behat_base {
             $timetable = $DB->get_record('block_objectives_timetable', $params, 'id', MUST_EXIST);
             $obj = explode(',', $row['objectives']);
             $obj = array_map(function ($obj) {
-                return '-'.$obj;
+                return '-' . $obj;
             }, $obj);
             $obj = implode("\n", $obj);
 

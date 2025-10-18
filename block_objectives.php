@@ -26,7 +26,6 @@
  * Class block_objectives
  */
 class block_objectives extends block_base {
-
     /**
      * Block initialisation
      * @throws coding_exception
@@ -67,7 +66,7 @@ class block_objectives extends block_base {
 
         $obj = new \block_objectives\objectives($COURSE);
 
-        $this->content = new stdClass;
+        $this->content = new stdClass();
         $this->content->text = $obj->get_block_text();
         $this->content->footer = $obj->get_block_footer();
 

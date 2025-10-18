@@ -24,13 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot.'/blocks/objectives/backup/moodle2/restore_objectives_stepslib.php');
+require_once($CFG->dirroot . '/blocks/objectives/backup/moodle2/restore_objectives_stepslib.php');
 
 /**
  * Class restore_objectives_block_task
  */
 class restore_objectives_block_task extends restore_block_task {
-
     /**
      * Define the restore settings
      */
@@ -78,4 +77,3 @@ class restore_objectives_block_task extends restore_block_task {
         return [];
     }
 }
-

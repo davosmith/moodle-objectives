@@ -30,7 +30,6 @@
  * Define the complete objectives structure for backup, with file and id annotations
  */
 class backup_objectives_block_structure_step extends backup_block_structure_step {
-
     /**
      * Define the structure to be backed up
      * @return backup_nested_element

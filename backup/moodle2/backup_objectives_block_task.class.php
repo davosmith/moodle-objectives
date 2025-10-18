@@ -25,13 +25,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/blocks/objectives/backup/moodle2/backup_objectives_stepslib.php');
+require_once($CFG->dirroot . '/blocks/objectives/backup/moodle2/backup_objectives_stepslib.php');
 
 /**
  * Class backup_objectives_block_task
  */
 class backup_objectives_block_task extends backup_block_task {
-
     /**
      * Define the backup settings
      */
@@ -71,4 +70,3 @@ class backup_objectives_block_task extends backup_block_task {
         return $content; // No special encoding of links.
     }
 }
-

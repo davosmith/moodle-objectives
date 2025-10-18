@@ -28,7 +28,7 @@ use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Class objectives_form
@@ -54,10 +54,10 @@ class objectives_form extends moodleform {
                 $mform->addElement('header', $day, get_string($day, 'calendar'));
                 $lastday = $lesson->day;
             }
-            $objlabel = userdate($lesson->starttime, get_string('strftimetime')).'-';
+            $objlabel = userdate($lesson->starttime, get_string('strftimetime')) . '-';
             $objlabel .= userdate($lesson->endtime, get_string('strftimetime'));
             if ($lesson->groupid > 0) {
-                $objlabel .= ' ('.$groups[$lesson->groupid]->name.')';
+                $objlabel .= ' (' . $groups[$lesson->groupid]->name . ')';
             }
             $mform->addElement('textarea', "obj[{$lesson->id}]", $objlabel, ['cols' => 40, 'rows' => 5]);
         }

@@ -68,7 +68,7 @@ class block_objectives_edit_form extends block_edit_form {
             $data = (object)$mform->exportValues();
             if ($data->action === 'savesettings') {
                 // Save out the settings I am interested in.
-                $upd = new stdClass;
+                $upd = new stdClass();
                 $upd->id = $data->objectivesid;
                 $upd->intro = $data->objectivesintro;
                 $DB->update_record('block_objectives', $upd);

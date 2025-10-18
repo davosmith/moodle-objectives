@@ -30,7 +30,6 @@
  * Define the complete objectives structure for restore
  */
 class restore_objectives_block_structure_step extends restore_structure_step {
-
     /**
      * Define the structure to be restored
      * @return array
@@ -40,8 +39,10 @@ class restore_objectives_block_structure_step extends restore_structure_step {
         $paths = [];
 
         $paths[] = new restore_path_element('objectives', '/block/objectives');
-        $paths[] = new restore_path_element('objectives_timetable',
-                                            '/block/objectives/objectives_timetables/objectives_timetable');
+        $paths[] = new restore_path_element(
+            'objectives_timetable',
+            '/block/objectives/objectives_timetables/objectives_timetable'
+        );
         $path = '/block/objectives/objectives_timetables/objectives_timetable/objectives_objectives/objectives_objective';
         $paths[] = new restore_path_element('objectives_objective', $path);
 
