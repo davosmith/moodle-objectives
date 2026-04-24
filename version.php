@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2025101800;
+$plugin->version = 2026042400;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.1.0.0';
+$plugin->release = '4.1.0.2';
 $plugin->component = 'block_objectives';
 $plugin->requires = 2022112800; // Moodle 4.1.0.
-$plugin->supported = [401, 501];
+$plugin->supported = [401, 502];

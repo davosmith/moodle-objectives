@@ -12,6 +12,7 @@ Other features include:
 
 ==Recent changes==
 
+2026-04-24 - 4.0.0.2 - M5.2 compatibility fixes
 2025-10-18 - 4.0.0.1 - M5.1 compatibility fixes
 2025-04-19 - 4.0.0.0 - M5.0 compatibility fixes, dropped support for M3.11 and below
 2024-10-19 - 3.4.2.2 - Minor M4.5 compatibility fixes
